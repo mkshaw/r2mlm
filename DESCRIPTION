@@ -1,0 +1,27 @@
+Package: r2mlm
+Type: Package
+Title: R-Squared Measures for Multilevel Models
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Mairead", "Shaw", email = "mairead.shaw@mail.mcgill.ca", role = c("aut", "cre")),
+    person("Jason", "Rights", email = "jrights@psych.ubc.ca", role = "aut"),
+    person("Sonya", "Sterba", email = "sonya.sterba@vanderbilt.edu", role = "aut"),
+    person("Jessica", "Flake", email = "jessica.flake@mcgill.ca", role = "aut"))
+Maintainer: Mairead Shaw <mairead.shaw@mail.mcgill.ca>
+Description: Generates both total- and level-specific R-squared measures for 
+    multilevel models with random intercepts and/or slopes based on a 
+    completely full decomposition of variance. Additionally generates graphical
+    representations of all R-squared measures.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    dplyr (>= 0.8.5),
+    tidyselect (>= 1.0.0)
+Depends: 
+    lme4 (>= 1.1.23),
+    nlme (>= 3.1.147),
+    R (>= 3.2.0)
+RoxygenNote: 7.1.0
+Suggests: 
+    testthat

@@ -1,0 +1,23 @@
+#' Popularity of students.
+#'
+#' A simulated dataset containing attributes of students and their teachers.
+#'
+#' @format A data frame with 2000 rows and 10 columns:
+#' \describe{
+#'   \item{pupil}{pupil ID number}
+#'   \item{class}{classroom number}
+#'   \item{extrav}{pupil extraversion, 10-point scale}
+#'   \item{sex}{pupil gender, boy = 0, girl = 1}
+#'   \item{texp}{teaching experience, years}
+#'   \item{popular}{pupil popularity, 10-point scale}
+#'   \item{mean_extraversion}{mean pupil extraversion, grouped by class}
+#'   \item{mean_sex}{mean pupil gender, grouped by class}
+#'   \item{extravCWC}{pupil extraversion, centered within cluster}
+#'   \item{sexCWC}{pupil gender, centered within cluster}
+#' }
+#'
+#' @source Hox, J. J., Moerbeek, M., & van de Schoot, R. (2010). Multilevel
+#' Analysis: Techniques and Applications, Second Edition: Taylor & Francis.
+"popularity"
+
+
