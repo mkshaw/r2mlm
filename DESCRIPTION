@@ -25,3 +25,5 @@ Depends:
 RoxygenNote: 7.1.0
 Suggests: 
     testthat
+URL: https://github.com/mkshaw/r2mlm
+BugReports: https://github.com/mkshaw/r2mlm/issues
