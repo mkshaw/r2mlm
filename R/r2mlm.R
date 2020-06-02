@@ -43,6 +43,12 @@
 #'
 #' @family r2mlm single model functions
 #'
+#' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME
+#' @import nlme
+#' @importFrom magrittr %>%
+#' @importFrom stats terms formula model.frame
+#'
+#'
 #' @export
 
 # 1 r2mlm Master Function -------------------------------------------------
@@ -65,7 +71,7 @@ r2mlm_lmer <- function(model) {
 
   # Step 1: pull data
 
-  data <- lme4::fortify.merMod(model)
+  data <- fortify.merMod(model)
 
   # Step 2: has_intercept
 
@@ -101,7 +107,7 @@ r2mlm_lmer <- function(model) {
 
   # (c) Filter temp_data by the number you extracted in 3b
   temp_data_number <- temp_data %>%
-    filter(temp_data[formula_length] == number) #temp_data[formula_length] is the column that holds the clustering variable
+    dplyr::filter(temp_data[formula_length] == number) #temp_data[formula_length] is the column that holds the clustering variable
 
   # (d) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
   x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars)
@@ -120,7 +126,7 @@ r2mlm_lmer <- function(model) {
 
   # Step 4: pull variable names for L1 predictors with random slopes into a variable called random_slope_vars
 
-  temp_cov_list <- lme4::ranef(model)[[1]]
+  temp_cov_list <- ranef(model)[[1]]
 
   # determine where to start pulling from the temp_cov_list, depending on whether you need to bypass the `(Intercept)` column
   if (has_intercept == 1) {
@@ -194,31 +200,31 @@ r2mlm_lmer <- function(model) {
   gammaw <- c()
   i = 1
   for (var in l1_vars) {
-    gammaw[[i]] <- lme4::fixef(model)[var]
+    gammaw[[i]] <- fixef(model)[var]
     i = i + 1
   }
 
   # 6b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab <- c()
   if (has_intercept == TRUE) {
-    gammab[[1]] <- lme4::fixef(model)[1]
+    gammab[[1]] <- fixef(model)[1]
     i = 2
   } else {
     i = 1
   }
   for (var in l2_vars) {
-    gammab[[i]] <- lme4::fixef(model)[var]
+    gammab[[i]] <- fixef(model)[var]
     i = i + 1
   }
 
   # Step 7: Tau matrix, results from VarCorr(model)
 
-  vcov <- lme4::VarCorr(model)
+  vcov <- VarCorr(model)
   tau <- as.matrix(Matrix::bdiag(vcov))
 
   # Step 8: sigma^2 value, Rij
 
-  sigma2 <- lme4::getME(model, "sigma")^2
+  sigma2 <- getME(model, "sigma")^2
 
   # Step 9: input everything into r2MLM
 

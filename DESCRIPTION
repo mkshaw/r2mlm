@@ -17,13 +17,15 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     dplyr (>= 0.8.5),
+    magrittr (>= 1.5),
     tidyselect (>= 1.0.0)
 Depends: 
     lme4 (>= 1.1.23),
-    nlme (>= 3.1.147),
+    nlme (>= 3.1.14),
     R (>= 3.2.0)
 RoxygenNote: 7.1.0
 Suggests: 
-    testthat
+    testthat,
+    Matrix
 URL: https://github.com/mkshaw/r2mlm
 BugReports: https://github.com/mkshaw/r2mlm/issues

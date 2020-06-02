@@ -21,8 +21,12 @@ r2mlm_manual(
 \item{data}{Dataset with rows denoting observations and columns denoting
 variables.}
 
-\item{between_covs}{List of numbers corresponding to the columns in the
+\item{within_covs}{List of numbers corresponding to the columns in the
 dataset of the level-1 predictors used in the MLM (if none used, set to
+NULL).}
+
+\item{between_covs}{List of numbers corresponding to the columns in the
+dataset of the level-2 predictors used in the MLM (if none used, set to
 NULL).}
 
 \item{random_covs}{List of numbers corresponding to the columns in the
@@ -75,7 +79,7 @@ popularity, REML = TRUE)
 r2mlm_manual(popularity, within_covs = c(9), between_covs = c(5), random_covs
 = c(9), gamma_w = c(0.4985), gamma_b = c(4.4149, 0.0464), Tau =
 matrix(c(0.5694, -0.0406, -0.0406, 0.0326), 2, 2), sigma2 = 0.8921,
-has_intercept = TRUE, clustermeancentered = TRUE))
+has_intercept = TRUE, clustermeancentered = TRUE)
 
 }
 \seealso{

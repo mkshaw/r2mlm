@@ -26,27 +26,32 @@ r2mlm_comp_manual(
 \item{data}{Dataset with rows denoting observations and columns denoting
 variables.}
 
-\item{between_covs_modA, between_covs_modB}{List of numbers corresponding to the columns in the
-dataset of the level-1 predictors used in the MLM (if none used, set to
+\item{within_covs_modA, within_covs_modB}{List of numbers corresponding to the
+columns in the dataset of the level-1 predictors used in the MLM (if none
+used, set to NULL).}
+
+\item{between_covs_modA, between_covs_modB}{List of numbers corresponding to
+the columns in the dataset of the level-2 predictors used in the MLM (if
+none used, set to NULL).}
+
+\item{random_covs_modA, random_covs_modB}{List of numbers corresponding to the
+columns in the dataset of the level-1 predictors that have random slopes in
+the MLM (if no random slopes, set to NULL).}
+
+\item{gamma_w_modA, gamma_w_modB}{Vector of fixed slope estimates for all
+level-1 predictors, to be entered in the order of the predictors listed by
+within_covs (if none, set to NULL).}
+
+\item{gamma_b_modA, gamma_b_modB}{Vector of fixed intercept estimate (if
+applicable; see has_intercept below) and fixed slope estimates for all
+level-2 predictors, to be entered intercept first (if applicable) followed
+by level-2 slopes in the order listed by between_covs (if none, set to
 NULL).}
 
-\item{random_covs_modA, random_covs_modB}{List of numbers corresponding to the columns in the
-dataset of the level-1 predictors that have random slopes in the MLM (if no
-random slopes, set to NULL).}
-
-\item{gamma_w_modA, gamma_w_modB}{Vector of fixed slope estimates for all level-1 predictors, to
-be entered in the order of the predictors listed by within_covs (if none,
-set to NULL).}
-
-\item{gamma_b_modA, gamma_b_modB}{Vector of fixed intercept estimate (if applicable; see
-has_intercept below) and fixed slope estimates for all level-2 predictors,
-to be entered intercept first (if applicable) followed by level-2 slopes in
-the order listed by between_covs (if none, set to NULL).}
-
-\item{Tau_modA, Tau_modB}{Random effect covariance matrix; note that the first row/column
-denotes the intercept variance and covariances (if intercept is fixed, set
-all to 0) and each subsequent row/column denotes a given random slope’s
-variance and covariances (to be entered in the order listed by
+\item{Tau_modA, Tau_modB}{Random effect covariance matrix; note that the first
+row/column denotes the intercept variance and covariances (if intercept is
+fixed, set all to 0) and each subsequent row/column denotes a given random
+slope’s variance and covariances (to be entered in the order listed by
 random_covs).}
 
 \item{sigma2_modA, sigma2_modB}{Level-1 residual variance.}

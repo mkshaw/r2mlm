@@ -45,6 +45,10 @@
 #'
 #' @family r2mlm model comparison functions
 #'
+#' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME
+#' @import nlme
+#' @importFrom magrittr %>%
+#' @importFrom stats terms formula model.frame
 #'
 #' @export
 

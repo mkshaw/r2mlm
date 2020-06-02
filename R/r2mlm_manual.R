@@ -7,8 +7,11 @@
 #'
 #' @param data Dataset with rows denoting observations and columns denoting
 #'   variables.
-#' @param between_covs List of numbers corresponding to the columns in the
+#' @param within_covs List of numbers corresponding to the columns in the
 #'   dataset of the level-1 predictors used in the MLM (if none used, set to
+#'   NULL).
+#' @param between_covs List of numbers corresponding to the columns in the
+#'   dataset of the level-2 predictors used in the MLM (if none used, set to
 #'   NULL).
 #' @param random_covs List of numbers corresponding to the columns in the
 #'   dataset of the level-1 predictors that have random slopes in the MLM (if no
@@ -56,6 +59,8 @@
 #'
 #' @family r2mlm single model functions
 #'
+#' @importFrom stats var
+#' @importFrom graphics barplot legend
 #'
 #' @export
 
