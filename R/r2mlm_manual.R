@@ -78,15 +78,15 @@ r2mlm_manual <- function(data, within_covs, between_covs, random_covs,
   }
   if(is.null(gamma)) gamma <- 0
   ##compute phi
-  phi <- var(cbind(1, data[, c(within_covs)], data[, c(between_covs)]), na.rm = T)
-  if(has_intercept == F) phi <- var(cbind(data[, c(within_covs)], data[, c(between_covs)]), na.rm = T)
+  phi <- var(cbind(1, data[, c(within_covs), drop = FALSE], data[, c(between_covs), drop = FALSE]), na.rm = T)
+  if(has_intercept == F) phi <- var(cbind(data[, c(within_covs), drop = FALSE], data[, c(between_covs), drop = FALSE]), na.rm = T)
   if(is.null(within_covs) == T & is.null(within_covs) == T & has_intercept == F) phi <- 0
-  phi_w <- var(data[, within_covs], na.rm = T)
+  phi_w <- var(data[, within_covs, drop = FALSE], na.rm = T)
   if(is.null(within_covs) == T) phi_w <- 0
-  phi_b <- var(cbind(1, data[, between_covs]), na.rm = T)
+  phi_b <- var(cbind(1, data[, between_covs, drop = FALSE]), na.rm = T)
   if(is.null(between_covs) == T) phi_b <- 0
   ##compute psi and kappa
-  var_randomcovs <- var(cbind(1, data[, c(random_covs)]), na.rm = T)
+  var_randomcovs <- var(cbind(1, data[, c(random_covs), drop = FALSE]), na.rm = T)
   if(length(Tau)>1) psi <- matrix(c(diag(Tau)), ncol = 1)
   if(length(Tau) == 1) psi <- Tau
   if(length(Tau)>1) kappa <- matrix(c(Tau[lower.tri(Tau) == TRUE]), ncol = 1)
@@ -98,7 +98,7 @@ r2mlm_manual <- function(data, within_covs, between_covs, random_covs,
     r <- 0
     m <- matrix(1, ncol = 1)
   }
-  if(length(random_covs)>0) m <- matrix(c(colMeans(cbind(1, data[, c(random_covs)]), na.rm = T)), ncol = 1)
+  if(length(random_covs)>0) m <- matrix(c(colMeans(cbind(1, data[, c(random_covs), drop = FALSE]), na.rm = T)), ncol = 1)
   ##total variance
   totalvar_notdecomp <- t(v)%*%psi + 2*(t(r)%*%kappa) + t(gamma)%*%phi%*%gamma + t(m)%*%Tau%*%m + sigma2
   totalwithinvar <- (t(gamma_w)%*%phi_w%*%gamma_w) + (t(v)%*%psi + 2*(t(r)%*%kappa)) + sigma2
