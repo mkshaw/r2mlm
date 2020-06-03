@@ -30,6 +30,7 @@ to helper functions that pull the raw data and parameter estimates from the
 model, and pass that information to \code{\link{r2mlm_manual}}.
 }
 \examples{
+\donttest{
 # Using lme4 for your model
 
 model_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data =
@@ -45,6 +46,7 @@ model_nlme <- lme(popular ~ 1 + extravCWC + texp,
                   method = "REML")
 
 r2mlm(model_nlme)
+}
 
 }
 \seealso{

@@ -20,9 +20,9 @@
 #'   model.
 #'
 #' @examples
+#' \donttest{
 #' # Using lme4 for your model
 #'
-#' \dontrun{
 #' model_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data =
 #' popularity, REML = TRUE)
 #'
