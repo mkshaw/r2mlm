@@ -22,6 +22,7 @@
 #' @examples
 #' # Using lme4 for your model
 #'
+#' \dontrun{
 #' model_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data =
 #' popularity, REML = TRUE)
 #'
@@ -35,6 +36,7 @@
 #'                   method = "REML")
 #'
 #' r2mlm(model_nlme)
+#' }
 #'
 #' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
 #'   S. K. (2019). Quantifying explained variance in multilevel models: An
