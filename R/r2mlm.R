@@ -45,7 +45,7 @@
 #' @family r2mlm single model functions
 #'
 #' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME
-#' @import nlme
+#' @importFrom nlme asOneFormula
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
 #'
@@ -255,7 +255,7 @@ r2mlm_nlme <- function(model) {
   all_vars <- all.vars(formula(model))
 
   # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
-  full_formula <- all.vars(nlme::asOneFormula(model))
+  full_formula <- all.vars(asOneFormula(model))
   grouping_var <- full_formula[length(full_formula)]
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)

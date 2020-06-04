@@ -46,7 +46,7 @@
 #' @family r2mlm model comparison functions
 #'
 #' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME
-#' @import nlme
+#' @importFrom nlme asOneFormula
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
 #'
@@ -421,7 +421,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   all_vars <- all.vars(formula(modelA))
 
   # in nlme, formula(modelA) doesn't return grouping var, but we'll need that later on, so let's grab it here
-  full_formula <- all.vars(nlme::asOneFormula(modelA))
+  full_formula <- all.vars(asOneFormula(modelA))
   grouping_var <- full_formula[length(full_formula)]
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)
@@ -583,7 +583,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   all_vars <- all.vars(formula(modelB))
 
   # in nlme, formula(modelB) doesn't return grouping var, but we'll need that later on, so let's grab it here
-  full_formula <- all.vars(nlme::asOneFormula(modelB))
+  full_formula <- all.vars(asOneFormula(modelB))
   grouping_var <- full_formula[length(full_formula)]
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)
