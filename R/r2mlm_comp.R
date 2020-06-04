@@ -41,7 +41,6 @@
 #'
 #' r2mlm_comp(modelA_nlme, modelB_nlme)
 #'
-#' @seealso
 #'
 #' @family r2mlm model comparison functions
 #'

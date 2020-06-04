@@ -87,10 +87,9 @@ between_covs_modB = c(5), random_covs_modB = c(9), gamma_w_modB = c(0.4562,
 1.2396), gamma_b_modB = c(4.3757, 0.0491), Tau_modB = matrix(c(0.5833,
 -0.0299, -0.0299, 0.0348), 2, 2), sigma2_modB = 0.5518)
 
+
 }
 \seealso{
-
-
 Other r2mlm model comparison functions: 
 \code{\link{r2mlm_comp}()}
 }

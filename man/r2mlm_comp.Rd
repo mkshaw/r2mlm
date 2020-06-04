@@ -51,10 +51,9 @@ modelB_nlme <- lme(popular ~ 1 + extravCWC + sexCWC + texp,
 
 r2mlm_comp(modelA_nlme, modelB_nlme)
 
+
 }
 \seealso{
-
-
 Other r2mlm model comparison functions: 
 \code{\link{r2mlm_comp_manual}()}
 }

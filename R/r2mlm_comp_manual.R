@@ -54,7 +54,6 @@
 #' 1.2396), gamma_b_modB = c(4.3757, 0.0491), Tau_modB = matrix(c(0.5833,
 #' -0.0299, -0.0299, 0.0348), 2, 2), sigma2_modB = 0.5518)
 #'
-#' @seealso
 #'
 #' @family r2mlm model comparison functions
 #'
