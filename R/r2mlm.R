@@ -403,7 +403,7 @@ r2mlm_nlme <- function(model) {
 
   # Step 9: input everything into r2mlm
 
-  r2mlm_manual(data, within_covs = within, between_covs = between, random_covs = random, gamma_w = gammaw, gamma_b = gammab, Tau = tau, sigma2 = sigma2, has_intercept = has_intercept, clustermeancentered = centeredwithincluster)
+  r2mlm_manual(as.data.frame(data), within_covs = within, between_covs = between, random_covs = random, gamma_w = gammaw, gamma_b = gammab, Tau = tau, sigma2 = sigma2, has_intercept = has_intercept, clustermeancentered = centeredwithincluster)
 
 }
 
