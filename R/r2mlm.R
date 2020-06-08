@@ -19,23 +19,6 @@
 #'   is not valid, it will return an error prompting the user to input a valid
 #'   model.
 #'
-#' @examples
-#' # Using lme4 for your model
-#'
-#' model_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data =
-#' popularity, REML = TRUE)
-#'
-#' r2mlm(model_lme4)
-#'
-#' # Using nlme for your model
-#'
-#' model_nlme <- lme(popular ~ 1 + extravCWC + texp,
-#'                   random = ~ 1 + extravCWC|class,
-#'                   data = popularity,
-#'                   method = "REML")
-#'
-#' r2mlm(model_nlme)
-#'
 #' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
 #'   S. K. (2019). Quantifying explained variance in multilevel models: An
 #'   integrative framework for defining R-squared measures. Psychological
