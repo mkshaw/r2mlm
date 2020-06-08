@@ -16,6 +16,34 @@
 #'   are not valid, it will return an error prompting the user to input valid
 #'   models.
 #'
+#' @examples
+#' \dontrun{
+#' # Using lme4 for your model
+#'
+#' modelA_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data
+#' = popularity, REML = TRUE)
+#'
+#' modelB_lme4 <- lmer(popular ~ 1 + extravCWC + sexCWC + texp +
+#' (extravCWC|class), data = popularity, REML = TRUE)
+#'
+#' r2mlm_comp(modelA_lme4, modelB_lme4)
+#'
+#' # Using nlme for your model
+#'
+#' modelA_nlme <- lme(popular ~ 1 + extravCWC + texp,
+#'                    random = ~ 1 + extravCWC|class,
+#'                    data = popularity,
+#'                    method = "REML")
+#'
+#' modelB_nlme <- lme(popular ~ 1 + extravCWC + sexCWC + texp,
+#'                    random = ~ 1 + extravCWC|class,
+#'                    data = popularity,
+#'                    method = "REML")
+#'
+#' r2mlm_comp(modelA_nlme, modelB_nlme)
+#' }
+#'
+#'
 #' @family r2mlm model comparison functions
 #'
 #' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME

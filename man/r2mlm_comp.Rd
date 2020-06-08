@@ -26,6 +26,35 @@ used to visualize changes in each measure across models.
 \details{
 #' Details: assumes cwc, hierarchy/nesting, both models lmer or both nlme, no mixing and matching
 }
+\examples{
+\dontrun{
+# Using lme4 for your model
+
+modelA_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data
+= popularity, REML = TRUE)
+
+modelB_lme4 <- lmer(popular ~ 1 + extravCWC + sexCWC + texp +
+(extravCWC|class), data = popularity, REML = TRUE)
+
+r2mlm_comp(modelA_lme4, modelB_lme4)
+
+# Using nlme for your model
+
+modelA_nlme <- lme(popular ~ 1 + extravCWC + texp,
+                   random = ~ 1 + extravCWC|class,
+                   data = popularity,
+                   method = "REML")
+
+modelB_nlme <- lme(popular ~ 1 + extravCWC + sexCWC + texp,
+                   random = ~ 1 + extravCWC|class,
+                   data = popularity,
+                   method = "REML")
+
+r2mlm_comp(modelA_nlme, modelB_nlme)
+}
+
+
+}
 \seealso{
 Other r2mlm model comparison functions: 
 \code{\link{r2mlm_comp_manual}()}
