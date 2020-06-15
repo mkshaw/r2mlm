@@ -109,7 +109,7 @@ r2mlm_lmer <- function(model) {
 
   # (c) Filter temp_data by the number you extracted in 3b
   temp_data_number <- temp_data %>%
-    dplyr::filter(temp_data[formula_length] == number) #temp_data[formula_length] is the column that holds the clustering variable
+    dplyr::filter(temp_data[formula_length] == as.character(number)) #temp_data[formula_length] is the column that holds the clustering variable
 
   # (d) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
   x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars)
@@ -289,7 +289,7 @@ r2mlm_nlme <- function(model) {
   # (c) Filter temp_data by the number you extracted in 3b
   temp_data_number <- temp_data %>%
     dplyr::ungroup() %>%
-    dplyr::filter(temp_data[formula_length] == number) #temp_data[formula_length] is the column that holds the clustering variable
+    dplyr::filter(temp_data[formula_length] == as.character(number)) #temp_data[formula_length] is the column that holds the clustering variable
 
   # (d) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
   x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars)
