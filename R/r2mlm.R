@@ -149,22 +149,26 @@ r2mlm_lmer <- function(model) {
 
   # Step 5: determine value of centeredwithincluster
 
-  for(var in l1_vars) {
+  if (is.null(l1_vars)) {
+    centeredwithincluster <- TRUE   # default to cwc = TRUE if there are no L1 vars
+  } else {
+    for (var in l1_vars) {
 
-    # Sum the l1 column at hand (var in l1_vars)
-    temp_sum <- temp_data_number %>%
-      dplyr::summarize(
-        sum = sum(temp_data_number[var])
-      ) %>%
-      dplyr::select(sum)
+      # Sum the l1 column at hand (var in l1_vars)
+      temp_sum <- temp_data_number %>%
+        dplyr::summarize(
+          sum = sum(temp_data_number[var])
+        ) %>%
+        dplyr::select(sum)
 
-    # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
-    #   then the column is centered within cluster
-    if (temp_sum < 0.0000001) {
-      centeredwithincluster <- TRUE
-    } else {
-      centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
-      break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2MLM function
+      # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
+      #   then the column is centered within cluster
+      if (temp_sum < 0.0000001) {
+        centeredwithincluster <- TRUE
+      } else {
+        centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
+        break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
+      }
     }
   }
 
@@ -325,22 +329,26 @@ r2mlm_nlme <- function(model) {
 
   # Step 5: determine value of centeredwithincluster
 
-  for(var in l1_vars) {
+  if (is.null(l1_vars)) {
+    centeredwithincluster <- TRUE   # default to cwc = TRUE if there are no L1 vars
+  } else {
+    for (var in l1_vars) {
 
-    # Sum the l1 column at hand (var in l1_vars)
-    temp_sum <- temp_data_number %>%
-      dplyr::summarize(
-        sum = sum(temp_data_number[var])
-      ) %>%
-      dplyr::select(sum)
+      # Sum the l1 column at hand (var in l1_vars)
+      temp_sum <- temp_data_number %>%
+        dplyr::summarize(
+          sum = sum(temp_data_number[var])
+        ) %>%
+        dplyr::select(sum)
 
-    # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
-    #   then the column is centered within cluster
-    if (temp_sum < 0.0000001) {
-      centeredwithincluster <- TRUE
-    } else {
-      centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
-      break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
+      # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
+      #   then the column is centered within cluster
+      if (temp_sum < 0.0000001) {
+        centeredwithincluster <- TRUE
+      } else {
+        centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
+        break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
+      }
     }
   }
 
