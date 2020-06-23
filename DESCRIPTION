@@ -18,6 +18,8 @@ LazyData: true
 Imports: 
     dplyr (>= 0.8.5),
     magrittr (>= 1.5),
+    rlang (>= 0.4.6),
+    stringr (>= 1.4.0),
     tidyselect (>= 1.0.0)
 Depends: 
     lme4 (>= 1.1.23),

@@ -79,7 +79,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   # Step 1: pull data
 
-  data <- lme4::fortify.merMod(modelA)
+  data <- lme4::getData(modelA)
 
   # Step 2: has_intercept
 

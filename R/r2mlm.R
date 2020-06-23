@@ -49,6 +49,8 @@
 #' @importFrom nlme asOneFormula
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
+#' @importFrom stringr str_split_fixed
+#' @importFrom rlang :=
 #'
 #'
 #' @export
@@ -73,7 +75,7 @@ r2mlm_lmer <- function(model) {
 
   # Step 1: pull data
 
-  data <- fortify.merMod(model)
+  data <- lme4::getData(model)
 
   # Step 2: has_intercept
 
@@ -147,6 +149,46 @@ r2mlm_lmer <- function(model) {
     running_count <- running_count + 1
   }
 
+  interaction_vars <- c()
+  x <- 1
+  for (term in attr(terms(model), "term.labels")) {
+
+    if (grepl(":", term) == TRUE) {
+      interaction_vars[x] <- term
+      x <- x + 1
+    }
+
+  }
+
+  data <- data %>% dplyr::ungroup() # need to ungroup in order to create new columns
+
+  for (whole in interaction_vars) {
+
+    half1 <- str_split_fixed(whole, ":", 2)[1]
+    half2 <- str_split_fixed(whole, ":", 2)[2]
+
+    if (!is.na(match(half1, l2_vars)) && !is.na(match(half2, l2_vars))) {
+      l2_vars[l2_counter] <- whole
+      l2_counter <- l2_counter + 1
+    } else {
+      l1_vars[l1_counter] <- whole
+      l1_counter <- l1_counter + 1
+    }
+
+    newcol <- dplyr::pull(data[half1] * data[half2])
+
+    data <- data %>%
+      dplyr::mutate(!!whole := newcol)
+
+  }
+
+  # Update temp_data_number to include the interaction vars
+
+  cluster_var <- all_vars[length(all_vars)]
+
+  temp_data_number_interactions <- data %>%
+    dplyr::filter(!!data[, cluster_var] == as.character(number))
+
   # Step 5: determine value of centeredwithincluster
 
   if (is.null(l1_vars)) {
@@ -155,9 +197,9 @@ r2mlm_lmer <- function(model) {
     for (var in l1_vars) {
 
       # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number %>%
+      temp_sum <- temp_data_number_interactions %>%
         dplyr::summarize(
-          sum = sum(temp_data_number[var])
+          sum = sum(temp_data_number_interactions[var])
         ) %>%
         dplyr::select(sum)
 
@@ -327,6 +369,46 @@ r2mlm_nlme <- function(model) {
     running_count <- running_count + 1
   }
 
+  interaction_vars <- c()
+  x <- 1
+  for (term in attr(terms(model), "term.labels")) {
+
+    if (grepl(":", term) == TRUE) {
+      interaction_vars[x] <- term
+      x <- x + 1
+    }
+
+  }
+
+  data <- data %>% dplyr::ungroup() # need to ungroup in order to create new columns
+
+  for (whole in interaction_vars) {
+
+    half1 <- str_split_fixed(whole, ":", 2)[1]
+    half2 <- str_split_fixed(whole, ":", 2)[2]
+
+    if (!is.na(match(half1, l2_vars)) && !is.na(match(half2, l2_vars))) {
+      l2_vars[l2_counter] <- whole
+      l2_counter <- l2_counter + 1
+    } else {
+      l1_vars[l1_counter] <- whole
+      l1_counter <- l1_counter + 1
+    }
+
+    newcol <- dplyr::pull(data[half1] * data[half2])
+
+    data <- data %>%
+      dplyr::mutate(!!whole := newcol)
+
+  }
+
+  # Update temp_data_number to include the interaction vars
+
+  cluster_var <- all_vars[length(all_vars)]
+
+  temp_data_number_interactions <- data %>%
+    dplyr::filter(!!data[, cluster_var] == as.character(number))
+
   # Step 5: determine value of centeredwithincluster
 
   if (is.null(l1_vars)) {
@@ -335,9 +417,9 @@ r2mlm_nlme <- function(model) {
     for (var in l1_vars) {
 
       # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number %>%
+      temp_sum <- temp_data_number_interactions %>%
         dplyr::summarize(
-          sum = sum(temp_data_number[var])
+          sum = sum(temp_data_number_interactions[var])
         ) %>%
         dplyr::select(sum)
 
