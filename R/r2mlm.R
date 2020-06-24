@@ -91,11 +91,26 @@ r2mlm_lmer <- function(model) {
   all_vars <- all.vars(formula(model))
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+  # a) Pull all variables except for cluster
+
+  all_vars_except_cluster <- all_vars[1:(length(all_vars) - 1)]
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars <- c()
   l2_vars <- c()
 
-  # iii) Sort variables into l1_vars and l2_vars
+  # iv) Sort variables into l1_vars and l2_vars
 
   # (a) Pull your temp dataset to work with
 
@@ -309,11 +324,24 @@ r2mlm_nlme <- function(model) {
   all_vars[length(all_vars) + 1] <- grouping_var
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+
+  # b) If any of those variables is non-numeric, then throw an error
+  # Unlike for lme4, in nlme all_vars doesn't include the grouping variable, so you don't need to filter it out
+
+  for (var in all_vars) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars <- c()
   l2_vars <- c()
 
-  # iii) Sort variables into l1_vars and l2_vars
+  # iv) Sort variables into l1_vars and l2_vars
 
   # (a) Pull your temp dataset to work with
 
