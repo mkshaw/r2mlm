@@ -97,11 +97,26 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   all_vars <- all.vars(formula(modelA))
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+  # a) Pull all variables except for cluster
+
+  all_vars_except_cluster <- all_vars[1:(length(all_vars) - 1)]
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars_A <- c()
   l2_vars_A <- c()
 
-  # iii) Sort variables into l1_vars_A and l2_vars_A
+  # iv) Sort variables into l1_vars_A and l2_vars_A
 
   # (a) Pull your temp dataset to work with
 
@@ -300,11 +315,26 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   all_vars <- all.vars(formula(modelB))
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+  # a) Pull all variables except for cluster
+
+  all_vars_except_cluster <- all_vars[1:(length(all_vars) - 1)]
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars_B <- c()
   l2_vars_B <- c()
 
-  # iii) Sort variables into l1_vars_B and l2_vars_B
+  # iv) Sort variables into l1_vars_B and l2_vars_B
 
   # (a) Pull your temp dataset to work with
 
@@ -519,7 +549,21 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   all_vars[length(all_vars) + 1] <- grouping_var
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  all_vars_except_cluster <- all.vars(formula(modelA))
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars_A <- c()
   l2_vars_A <- c()
 
@@ -750,7 +794,21 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   all_vars[length(all_vars) + 1] <- grouping_var
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  all_vars_except_cluster <- all.vars(formula(modelB))
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars_B <- c()
   l2_vars_B <- c()
 

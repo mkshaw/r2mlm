@@ -327,9 +327,10 @@ r2mlm_nlme <- function(model) {
   # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
 
   # b) If any of those variables is non-numeric, then throw an error
-  # Unlike for lme4, in nlme all_vars doesn't include the grouping variable, so you don't need to filter it out
 
-  for (var in all_vars) {
+  all_vars_except_cluster <- all.vars(formula(model))
+
+  for (var in all_vars_except_cluster) {
 
     if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
