@@ -50,6 +50,8 @@
 #' @importFrom nlme asOneFormula
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
+#' @importFrom stringr str_split_fixed
+#' @importFrom rlang :=
 #'
 #' @export
 
@@ -79,7 +81,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   # Step 1: pull data
 
-  data <- lme4::fortify.merMod(modelA)
+  data <- lme4::getData(modelA)
 
   # Step 2: has_intercept
 
@@ -95,11 +97,26 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   all_vars <- all.vars(formula(modelA))
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+  # a) Pull all variables except for cluster
+
+  all_vars_except_cluster <- all_vars[1:(length(all_vars) - 1)]
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars_A <- c()
   l2_vars_A <- c()
 
-  # iii) Sort variables into l1_vars_A and l2_vars_A
+  # iv) Sort variables into l1_vars_A and l2_vars_A
 
   # (a) Pull your temp dataset to work with
 
@@ -153,6 +170,46 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
     running_count <- running_count + 1
   }
 
+  interaction_vars_A <- c()
+  x <- 1
+  for (term in attr(terms(modelA), "term.labels")) {
+
+    if (grepl(":", term) == TRUE) {
+      interaction_vars_A[x] <- term
+      x <- x + 1
+    }
+
+  }
+
+  data <- data %>% dplyr::ungroup() # need to ungroup in order to create new columns
+
+  for (whole in interaction_vars_A) {
+
+    half1 <- str_split_fixed(whole, ":", 2)[1]
+    half2 <- str_split_fixed(whole, ":", 2)[2]
+
+    if (!is.na(match(half1, l2_vars_A)) && !is.na(match(half2, l2_vars_A))) {
+      l2_vars_A[l2_counter] <- whole
+      l2_counter <- l2_counter + 1
+    } else {
+      l1_vars_A[l1_counter] <- whole
+      l1_counter <- l1_counter + 1
+    }
+
+    newcol <- dplyr::pull(data[half1] * data[half2])
+
+    data <- data %>%
+      dplyr::mutate(!!whole := newcol)
+
+  }
+
+  # Update temp_data_number to include the interaction vars
+
+  cluster_var <- all_vars[length(all_vars)]
+
+  temp_data_number_interactions_A <- data %>%
+    dplyr::filter(!!data[, cluster_var] == as.character(number)) # sort data by cluster variable
+
   # Step 5: determine value of centeredwithincluster
 
   if (is.null(l1_vars_A)) {
@@ -161,9 +218,9 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
     for (var in l1_vars_A) {
 
       # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number %>%
+      temp_sum <- temp_data_number_interactions_A %>%
         dplyr::summarize(
-          sum = sum(temp_data_number[var])
+          sum = sum(temp_data_number_interactions_A[var])
         ) %>%
         dplyr::select(sum)
 
@@ -199,7 +256,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   }
 
   # 5c) pull column numbers for random_covs (l1 variables with random slopes)
-  random_A<- c()
+  random_A <- c()
   i = 1
   for (var in random_slope_vars_A) {
     tmp <- match(var, names(data))
@@ -258,11 +315,26 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   all_vars <- all.vars(formula(modelB))
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+  # a) Pull all variables except for cluster
+
+  all_vars_except_cluster <- all_vars[1:(length(all_vars) - 1)]
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars_B <- c()
   l2_vars_B <- c()
 
-  # iii) Sort variables into l1_vars_B and l2_vars_B
+  # iv) Sort variables into l1_vars_B and l2_vars_B
 
   # (a) Pull your temp dataset to work with
 
@@ -316,6 +388,46 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
     running_count <- running_count + 1
   }
 
+  interaction_vars_B <- c()
+  x <- 1
+  for (term in attr(terms(modelB), "term.labels")) {
+
+    if (grepl(":", term) == TRUE) {
+      interaction_vars_B[x] <- term
+      x <- x + 1
+    }
+
+  }
+
+  data <- data %>% dplyr::ungroup() # need to ungroup in order to create new columns
+
+  for (whole in interaction_vars_B) {
+
+    half1 <- str_split_fixed(whole, ":", 2)[1]
+    half2 <- str_split_fixed(whole, ":", 2)[2]
+
+    if (!is.na(match(half1, l2_vars_B)) && !is.na(match(half2, l2_vars_B))) {
+      l2_vars_B[l2_counter] <- whole
+      l2_counter <- l2_counter + 1
+    } else {
+      l1_vars_B[l1_counter] <- whole
+      l1_counter <- l1_counter + 1
+    }
+
+    newcol <- dplyr::pull(data[half1] * data[half2])
+
+    data <- data %>%
+      dplyr::mutate(!!whole := newcol)
+
+  }
+
+  # Update temp_data_number to include the interaction vars
+
+  cluster_var <- all_vars[length(all_vars)]
+
+  temp_data_number_interactions_B <- data %>%
+    dplyr::filter(!!data[, cluster_var] == as.character(number))
+
   # Step 5: determine value of centeredwithincluster
 
   if (is.null(l1_vars_B)) {
@@ -324,9 +436,9 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
     for (var in l1_vars_B) {
 
       # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number %>%
+      temp_sum <- temp_data_number_interactions_B %>%
         dplyr::summarize(
-          sum = sum(temp_data_number[var])
+          sum = sum(temp_data_number_interactions_B[var])
         ) %>%
         dplyr::select(sum)
 
@@ -362,7 +474,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   }
 
   # 5c) pull column numbers for random_covs (l1 variables with random slopes)
-  random_B<- c()
+  random_B <- c()
   i = 1
   for (var in random_slope_vars_B) {
     tmp <- match(var, names(data))
@@ -437,7 +549,21 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   all_vars[length(all_vars) + 1] <- grouping_var
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  all_vars_except_cluster <- all.vars(formula(modelA))
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars_A <- c()
   l2_vars_A <- c()
 
@@ -495,6 +621,71 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     random_slope_vars_A[x] <- names(temp_cov_list[running_count])
     x <- x + 1
     running_count <- running_count + 1
+  }
+
+  interaction_vars_A <- c()
+  x <- 1
+  for (term in attr(terms(modelA), "term.labels")) {
+
+    if (grepl(":", term) == TRUE) {
+      interaction_vars_A[x] <- term
+      x <- x + 1
+    }
+
+  }
+
+  data <- data %>% dplyr::ungroup() # need to ungroup in order to create new columns
+
+  for (whole in interaction_vars_A) {
+
+    half1 <- str_split_fixed(whole, ":", 2)[1]
+    half2 <- str_split_fixed(whole, ":", 2)[2]
+
+    if (!is.na(match(half1, l2_vars_A)) && !is.na(match(half2, l2_vars_A))) {
+      l2_vars_A[l2_counter] <- whole
+      l2_counter <- l2_counter + 1
+    } else {
+      l1_vars_A[l1_counter] <- whole
+      l1_counter <- l1_counter + 1
+    }
+
+    newcol <- dplyr::pull(data[half1] * data[half2])
+
+    data <- data %>%
+      dplyr::mutate(!!whole := newcol)
+
+  }
+
+  # Update temp_data_number to include the interaction vars
+
+  cluster_var <- all_vars[length(all_vars)]
+
+  temp_data_number_interactions_A <- data %>%
+    dplyr::filter(!!data[, cluster_var] == as.character(number)) # sort data by cluster variable
+
+  # Step 5: determine value of centeredwithincluster
+
+  if (is.null(l1_vars_A)) {
+    centeredwithincluster <- TRUE   # default to cwc = TRUE if there are no L1 vars
+  } else {
+    for (var in l1_vars_A) {
+
+      # Sum the l1 column at hand (var in l1_vars)
+      temp_sum <- temp_data_number_interactions_A %>%
+        dplyr::summarize(
+          sum = sum(temp_data_number_interactions_A[var])
+        ) %>%
+        dplyr::select(sum)
+
+      # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
+      #   then the column is centered within cluster
+      if (temp_sum < 0.0000001) {
+        centeredwithincluster <- TRUE
+      } else {
+        centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
+        break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
+      }
+    }
   }
 
   # Step 5: determine value of centeredwithincluster
@@ -603,7 +794,21 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   all_vars[length(all_vars) + 1] <- grouping_var
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
-  # ii) Create vectors to fill
+  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+
+  # b) If any of those variables is non-numeric, then throw an error
+
+  all_vars_except_cluster <- all.vars(formula(modelB))
+
+  for (var in all_vars_except_cluster) {
+
+    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+      stop("Your data must be numeric. Only the cluster variable can be a factor.")
+    }
+
+  }
+
+  # iii) Create vectors to fill
   l1_vars_B <- c()
   l2_vars_B <- c()
 
@@ -663,6 +868,46 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     running_count <- running_count + 1
   }
 
+  interaction_vars_B <- c()
+  x <- 1
+  for (term in attr(terms(modelB), "term.labels")) {
+
+    if (grepl(":", term) == TRUE) {
+      interaction_vars_B[x] <- term
+      x <- x + 1
+    }
+
+  }
+
+  data <- data %>% dplyr::ungroup() # need to ungroup in order to create new columns
+
+  for (whole in interaction_vars_B) {
+
+    half1 <- str_split_fixed(whole, ":", 2)[1]
+    half2 <- str_split_fixed(whole, ":", 2)[2]
+
+    if (!is.na(match(half1, l2_vars_B)) && !is.na(match(half2, l2_vars_B))) {
+      l2_vars_B[l2_counter] <- whole
+      l2_counter <- l2_counter + 1
+    } else {
+      l1_vars_B[l1_counter] <- whole
+      l1_counter <- l1_counter + 1
+    }
+
+    newcol <- dplyr::pull(data[half1] * data[half2])
+
+    data <- data %>%
+      dplyr::mutate(!!whole := newcol)
+
+  }
+
+  # Update temp_data_number to include the interaction vars
+
+  cluster_var <- all_vars[length(all_vars)]
+
+  temp_data_number_interactions_B <- data %>%
+    dplyr::filter(!!data[, cluster_var] == as.character(number)) # sort data by cluster variable
+
   # Step 5: determine value of centeredwithincluster
 
   if (is.null(l1_vars_B)) {
@@ -671,9 +916,9 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     for (var in l1_vars_B) {
 
       # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number %>%
+      temp_sum <- temp_data_number_interactions_B %>%
         dplyr::summarize(
-          sum = sum(temp_data_number[var])
+          sum = sum(temp_data_number_interactions_B[var])
         ) %>%
         dplyr::select(sum)
 
