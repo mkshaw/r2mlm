@@ -45,7 +45,7 @@
 #'
 #' @family r2mlm single model functions
 #'
-#' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME
+#' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME getData
 #' @importFrom nlme asOneFormula
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
@@ -75,7 +75,7 @@ r2mlm_lmer <- function(model) {
 
   # Step 1: pull data
 
-  data <- lme4::getData(model)
+  data <- getData(model)
 
   # Step 2: has_intercept
 
