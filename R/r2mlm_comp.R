@@ -770,7 +770,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
   # Step 8: sigma^2 value, Rij
 
-  sigma2_A <- modelA$sigma
+  sigma2_A <- modelA$sigma^2
 
 
   # EXTRACT FOR MODEL B
@@ -990,7 +990,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
   # Step 8: sigma^2 value, Rij
 
-  sigma2_B <- modelB$sigma
+  sigma2_B <- modelB$sigma^2
 
   # Step 9: input everything into r2mlm_
 

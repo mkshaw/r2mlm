@@ -520,7 +520,7 @@ r2mlm_nlme <- function(model) {
 
   # Step 8: sigma^2 value, Rij
 
-  sigma2 <- model$sigma
+  sigma2 <- model$sigma^2
 
   # Step 9: input everything into r2mlm
 
