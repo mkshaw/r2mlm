@@ -124,11 +124,17 @@ r2mlm_lmer <- function(model) {
     dplyr::top_n(1) %>% # returns the ID and N of the largest group
     dplyr::pull(1) # returns the number of the group that you'll use for your variance check
 
-  # (c) Filter temp_data by the number you extracted in 3b
+  # (c) If there is more than one largest group, just pick the first one
+
+  if (length(number) > 1) {
+    number <- number[1]
+  }
+
+  # (d) Filter temp_data by the number you extracted in 3b
   temp_data_number <- temp_data %>%
     dplyr::filter(temp_data[formula_length] == as.character(number)) #temp_data[formula_length] is the column that holds the clustering variable
 
-  # (d) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
+  # (e) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
   x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars)
   l1_counter <- 1 # setting a counter for adding to l1_vars list
   l2_counter <- 1 # setting a counter for adding to l2_vars list
@@ -357,12 +363,18 @@ r2mlm_nlme <- function(model) {
     dplyr::top_n(1) %>% # returns the ID and N of the largest group
     dplyr::pull(1) # returns the number of the group that you'll use for your variance check
 
-  # (c) Filter temp_data by the number you extracted in 3b
+  # (c) If there are multiple largest groups, just take the first group
+
+  if (length(number) > 1) {
+    number <- number[1]
+  }
+
+  # (d) Filter temp_data by the number you extracted in 3b
   temp_data_number <- temp_data %>%
     dplyr::ungroup() %>%
     dplyr::filter(temp_data[formula_length] == as.character(number)) #temp_data[formula_length] is the column that holds the clustering variable
 
-  # (d) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
+  # (e) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
   x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars)
   l1_counter <- 1 # setting a counter for adding to l1_vars list
   l2_counter <- 1 # setting a counter for adding to l2_vars list
