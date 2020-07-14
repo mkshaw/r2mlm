@@ -1,23 +1,20 @@
-#' Popularity of students.
+#' Teacher job satisfaction.
 #'
-#' A simulated dataset containing attributes of students and their teachers.
+#' A simulated dataset containing information about teacher job satisfaction.
+#' Teachers clustered within schools.
 #'
 #' @format A data frame with 2000 rows and 10 columns:
 #' \describe{
-#'   \item{pupil}{pupil ID number}
-#'   \item{class}{classroom number}
-#'   \item{extrav}{pupil extraversion, 10-point scale}
-#'   \item{sex}{pupil gender, boy = 0, girl = 1}
-#'   \item{texp}{teaching experience, years}
-#'   \item{popular}{pupil popularity, 10-point scale}
-#'   \item{mean_extraversion}{mean pupil extraversion, grouped by class}
-#'   \item{mean_sex}{mean pupil gender, grouped by class}
-#'   \item{extravCWC}{pupil extraversion, centered within cluster}
-#'   \item{sexCWC}{pupil gender, centered within cluster}
+#'   \item{schoolID}{school ID number}
+#'   \item{teacherID}{teacher ID number}
+#'   \item{satisfaction}{teacher job satisfaction}
+#'   \item{control_c}{teacher control over curriculum, centered within school}
+#'   \item{salary_c}{teacher salary, centered within school}
+#'   \item{control_m}{teacher control over curriculum, school mean}
+#'   \item{salary_m}{teacher salary, school mean, in thousands of dollars}
+#'   \item{leadership}{school leadership competence}
+#'   \item{type}{type of school: public, private, or charter}
 #' }
-#'
-#' @source Hox, J. J., Moerbeek, M., & van de Schoot, R. (2010). Multilevel
-#' Analysis: Techniques and Applications, Second Edition: Taylor & Francis.
-"popularity"
+"teachsat"
 
 
