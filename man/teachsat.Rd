@@ -5,7 +5,7 @@
 \alias{teachsat}
 \title{Teacher job satisfaction.}
 \format{
-A data frame with 9000 rows and 14 columns:
+A data frame with 9000 rows and 8 columns:
 \describe{
   \item{schoolID}{school identification number}
   \item{teacherID}{teacher identification number}

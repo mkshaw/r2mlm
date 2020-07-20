@@ -40,20 +40,19 @@
 #'
 #' @examples
 #'
-#' modelA_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data
-#' = popularity, REML = TRUE)
+#' modelA <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
+#' control_m + s_t_ratio + (1 | schoolID), data = teachsat, REML = TRUE)
 #'
-#' modelB_lme4 <- lmer(popular ~ 1 + extravCWC + sexCWC + texp +
-#' (extravCWC|class), data = popularity, REML = TRUE)
+#' modelB <- lmer(satisfaction ~ 1 + control_c + control_m + s_t_ratio + (1
+#' | schoolID), data = teachsat, REML = TRUE)
 #'
-#' r2mlm_comp_manual(data = popularity, within_covs_modA = c(9),
-#' between_covs_modA = c(5), random_covs_modA = c(9), gamma_w_modA = c(0.4985),
-#' gamma_b_modA = c(4.4149, 0.0464), Tau_modA = matrix(c(0.5694, -0.0406,
-#' -0.0406, 0.0326), 2, 2), sigma2_modA = 0.8921, within_covs_modB = c(9, 10),
-#' between_covs_modB = c(5), random_covs_modB = c(9), gamma_w_modB = c(0.4562,
-#' 1.2396), gamma_b_modB = c(4.3757, 0.0491), Tau_modB = matrix(c(0.5833,
-#' -0.0299, -0.0299, 0.0348), 2, 2), sigma2_modB = 0.5518)
-#'
+#' r2mlm_comp_manual(data = teachsat, within_covs_modA = c(5, 4),
+#' between_covs_modA = c(7, 6, 8), random_covs_modA = NULL, gamma_w_modA =
+#' c(1.52595, 2.66361), gamma_b_modA = c(19.68596, 1.43791, 3.65461, -0.36449),
+#' Tau_modA = matrix(c(18.28349), 1, 1), sigma2_modA = 47.74, within_covs_modB =
+#' c(4), between_covs_modB = c(6, 8), random_covs_modB = NULL, gamma_w_modB =
+#' c(2.67877), gamma_b_modB = c(19.68596, 3.61712, -0.42340), Tau_modB =
+#' matrix(c(26.77), 1, 1), sigma2_modB = 56.99)
 #'
 #' @family r2mlm model comparison functions
 #'

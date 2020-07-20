@@ -3,7 +3,7 @@
 #' A simulated dataset containing information about teacher job satisfaction.
 #' Teachers clustered within schools.
 #'
-#' @format A data frame with 9000 rows and 14 columns:
+#' @format A data frame with 9000 rows and 8 columns:
 #' \describe{
 #'   \item{schoolID}{school identification number}
 #'   \item{teacherID}{teacher identification number}

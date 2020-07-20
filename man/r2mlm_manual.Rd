@@ -73,12 +73,13 @@ decompositions. Any number of level-1 and/or level-2 predictors is supported.
 Any of the level-1 predictors can have random slopes.
 }
 \examples{
-model <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data =
-popularity, REML = TRUE)
+model <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
+control_m + s_t_ratio + (1 | schoolID), data = teachsat, REML =
+TRUE)
 
-r2mlm_manual(popularity, within_covs = c(9), between_covs = c(5), random_covs
-= c(9), gamma_w = c(0.4985), gamma_b = c(4.4149, 0.0464), Tau =
-matrix(c(0.5694, -0.0406, -0.0406, 0.0326), 2, 2), sigma2 = 0.8921,
+r2mlm_manual(data = teachsat, within_covs = c(5, 4), between_covs = c(7, 6, 8),
+random_covs = NULL, gamma_w = c(1.52595, 2.66361), gamma_b = c(19.68596,
+1.43791, 3.65461, -0.36449), Tau = matrix(c(18.28349), 1, 1), sigma2 = 47.74,
 has_intercept = TRUE, clustermeancentered = TRUE)
 
 }
