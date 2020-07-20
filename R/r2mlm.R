@@ -23,16 +23,18 @@
 #' \dontrun{
 #' # Using lme4 for your model
 #'
-#' model_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data =
-#' popularity, REML = TRUE)
+#' model_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
+#' control_m + s_t_ratio + (1 | schoolID), data = teachsat, REML =
+#' TRUE)
 #'
 #' r2mlm(model_lme4)
 #'
 #' # Using nlme for your model
 #'
-#' model_nlme <- lme(popular ~ 1 + extravCWC + texp,
-#'                   random = ~ 1 + extravCWC|class,
-#'                   data = popularity,
+#' model_nlme <- lme(satisfaction ~ 1 + salary_c + control_c + salary_m +
+#'                   control_m + s_t_ratio,
+#'                   random = ~ 1 | schoolID,
+#'                   data = teachsat,
 #'                   method = "REML")
 #'
 #' r2mlm(model_nlme)

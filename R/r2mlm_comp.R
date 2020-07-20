@@ -20,25 +20,34 @@
 #' \dontrun{
 #' # Using lme4 for your model
 #'
-#' modelA_lme4 <- lmer(popular ~ 1 + extravCWC + texp + (extravCWC|class), data
-#' = popularity, REML = TRUE)
+#' # Model A
 #'
-#' modelB_lme4 <- lmer(popular ~ 1 + extravCWC + sexCWC + texp +
-#' (extravCWC|class), data = popularity, REML = TRUE)
+#' modelA_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
+#' control_m + s_t_ratio + (1 | schoolID), data = teachsat, REML = TRUE)
+#'
+#' # Model B, "salary" components removed
+#'
+#' modelB_lme4 <- lmer(satisfaction ~ 1 + control_c + control_m + s_t_ratio + (1
+#' | schoolID), data = teachsat, REML = TRUE)
 #'
 #' r2mlm_comp(modelA_lme4, modelB_lme4)
 #'
 #' # Using nlme for your model
 #'
-#' modelA_nlme <- lme(popular ~ 1 + extravCWC + texp,
-#'                    random = ~ 1 + extravCWC|class,
-#'                    data = popularity,
-#'                    method = "REML")
+#' # Model A
 #'
-#' modelB_nlme <- lme(popular ~ 1 + extravCWC + sexCWC + texp,
-#'                    random = ~ 1 + extravCWC|class,
-#'                    data = popularity,
-#'                    method = "REML")
+#' modelA_nlme <- lme(satisfaction ~ 1 + salary_c + control_c + salary_m +
+#'                   control_m + s_t_ratio,
+#'                   random = ~ 1 | schoolID,
+#'                   data = teachsat,
+#'                   method = "REML")
+#'
+#' # Model B, "salary" components removed
+#'
+#' modelB_nlme <- lme(satisfaction ~ 1 + control_c + control_m + s_t_ratio,
+#'                   random = ~ 1 | schoolID,
+#'                   data = teachsat,
+#'                   method = "REML")
 #'
 #' r2mlm_comp(modelA_nlme, modelB_nlme)
 #' }
