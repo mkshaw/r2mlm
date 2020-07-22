@@ -105,6 +105,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   # i) Pull all variable names from the formula
   all_vars <- all.vars(formula(modelA))
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
+  cluster_variable <- all_vars[formula_length] # pull cluster, we'll need it later
 
   # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
   # a) Pull all variables except for cluster
@@ -131,38 +132,47 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   temp_data <- model.frame(modelA) # this pulls a df of all variables and values used in the modelA
 
-  # (b) Isolate the largest group from the dataframe, which you'll use to test variances of variables to sort into l1 and l2 lists
-  number <- temp_data %>%
-    dplyr::group_by_at(formula_length) %>% #group by the clustering variable, which is the last variable in the df (by virtue of how formula(modelA) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
-    dplyr::count() %>%
-    dplyr::ungroup() %>% #have to ungroup because otherwise top_n will return n rows from each group, rather than n groups
-    dplyr::top_n(1) %>% # returns the ID and N of the largest group
-    dplyr::pull(1) # returns the number of the group that you'll use for your variance check
+  # (b) group dataset by clustering variable
+  temp_data_grouped <- temp_data %>%
+    dplyr::group_by_at(formula_length) #group by the clustering variable, which is the last variable in the df (by virtue of how formula(model) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
 
-  # (c) If there is more than one largest group, just pick the first one
+  # (c) define variables you'll need
 
-  if (length(number) > 1) {
-    number <- number[1]
-  }
+  # all variables to sort into L1 and L2
+  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
 
-  # (d) Filter temp_data by the number you extracted in 3b
-  temp_data_number <- temp_data %>%
-    dplyr::filter(temp_data[formula_length] == as.character(number)) #temp_data[formula_length] is the column that holds the clustering variable
+  # set counters
+  l1_counter <- 1
+  l2_counter <- 1
 
-  # (e) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
-  x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars_A)
-  l1_counter <- 1 # setting a counter for adding to l1_vars_A list
-  l2_counter <- 1 # setting a counter for adding to l2_vars_A list
-  while (x < formula_length) {
-    if (var(temp_data_number[x]) == 0) {
-      l2_vars_A[l2_counter] <- names(temp_data_number[x])
+  # (d) loop through all variables in grouped dataset
+
+  for (variable in all_vars_except_cluster_and_outcome) {
+
+    # calculate variance for each cluster
+    t <- temp_data_grouped %>%
+      dplyr::select(cluster_variable, variable) %>%
+      dplyr::group_map(~ var(.))
+
+    # variable to track variance
+    variance_tracker <- 0
+
+    # add up the variance from each cluster
+    for (i in t) {
+      variance_tracker <- variance_tracker + i
+    }
+
+    # if the sum of variance is 0, then each cluster has 0 variance, so it's an L2 variable
+    if (variance_tracker == 0) {
+      l2_vars_A[l2_counter] <- variable
       l2_counter <- l2_counter + 1
     } else {
-      l1_vars_A[l1_counter] <- names(temp_data_number[x])
+      l1_vars_A[l1_counter] <- variable
       l1_counter <- l1_counter + 1
     }
-    x <- x + 1 # iterate the counter
+
   }
+
 
   # Step 4: pull variable names for L1 predictors with random slopes into a variable called random_slope_vars_A
 
@@ -218,35 +228,39 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   }
 
-  # Update temp_data_number to include the interaction vars
-
-  cluster_var <- all_vars[length(all_vars)]
-
-  temp_data_number_interactions_A <- data %>%
-    dplyr::filter(!!data[, cluster_var] == as.character(number)) # sort data by cluster variable
-
   # Step 5: determine value of centeredwithincluster
 
+  # (a) group data
+
+  data_grouped <- data %>%
+    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+
   if (is.null(l1_vars_A)) {
-    centeredwithincluster <- TRUE   # default to cwc = TRUE if there are no L1 vars
+    centeredwithincluster <- TRUE
   } else {
-    for (var in l1_vars_A) {
+    for (variable in l1_vars_A) {
 
-      # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number_interactions_A %>%
-        dplyr::summarize(
-          sum = sum(temp_data_number_interactions_A[var])
-        ) %>%
-        dplyr::select(sum)
+      # for each group for the given variable, sum all values
+      t <- data_grouped %>%
+        dplyr::select(cluster_variable, variable) %>%
+        dplyr::group_map(~ sum(.))
 
-      # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
-      #   then the column is centered within cluster
-      if (temp_sum < 0.0000001) {
+      # establish temporary tracker
+      temp_tracker <- 0
+
+      # sum all of the sums
+      for (i in t) {
+        temp_tracker <- temp_tracker + i
+      }
+
+      # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
+      if (temp_tracker < 0.0000001) {
         centeredwithincluster <- TRUE
       } else {
-        centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
-        break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
+        centeredwithincluster <- FALSE
+        break # break if even one variable is not CWC, because the r2mlm_manual function will need to center everything anyways
       }
+
     }
   }
 
@@ -329,6 +343,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   # i) Pull all variable names from the formula
   all_vars <- all.vars(formula(modelB))
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
+  cluster_variable <- all_vars[formula_length] # pull cluster, we'll need it later
 
   # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
   # a) Pull all variables except for cluster
@@ -355,37 +370,45 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   temp_data <- model.frame(modelB) # this pulls a df of all variables and values used in the modelB
 
-  # (b) Isolate the largest group from the dataframe, which you'll use to test variances of variables to sort into l1 and l2 lists
-  number <- temp_data %>%
-    dplyr::group_by_at(formula_length) %>% #group by the clustering variable, which is the last variable in the df (by virtue of how formula(modelB) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
-    dplyr::count() %>%
-    dplyr::ungroup() %>% #have to ungroup because otherwise top_n will return n rows from each group, rather than n groups
-    dplyr::top_n(1) %>% # returns the ID and N of the largest group
-    dplyr::pull(1) # returns the number of the group that you'll use for your variance check
+  # (b) group dataset by clustering variable
+  temp_data_grouped <- temp_data %>%
+    dplyr::group_by_at(formula_length) #group by the clustering variable, which is the last variable in the df (by virtue of how formula(model) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
 
-  # (c) If there is more than one largest group, just pick the first one
+  # (c) define variables you'll need
 
-  if (length(number) > 1) {
-    number <- number[1]
-  }
+  # all variables to sort into L1 and L2
+  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
 
-  # (d) Filter temp_data by the number you extracted in 3b
-  temp_data_number <- temp_data %>%
-    dplyr::filter(temp_data[formula_length] == as.character(number)) #temp_data[formula_length] is the column that holds the clustering variable
+  # set counters
+  l1_counter <- 1
+  l2_counter <- 1
 
-  # (e) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
-  x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars_B)
-  l1_counter <- 1 # setting a counter for adding to l1_vars_B list
-  l2_counter <- 1 # setting a counter for adding to l2_vars_B list
-  while (x < formula_length) {
-    if (var(temp_data_number[x]) == 0) {
-      l2_vars_B[l2_counter] <- names(temp_data_number[x])
+  # (d) loop through all variables in grouped dataset
+
+  for (variable in all_vars_except_cluster_and_outcome) {
+
+    # calculate variance for each cluster
+    t <- temp_data_grouped %>%
+      dplyr::select(cluster_variable, variable) %>%
+      dplyr::group_map(~ var(.))
+
+    # variable to track variance
+    variance_tracker <- 0
+
+    # add up the variance from each cluster
+    for (i in t) {
+      variance_tracker <- variance_tracker + i
+    }
+
+    # if the sum of variance is 0, then each cluster has 0 variance, so it's an L2 variable
+    if (variance_tracker == 0) {
+      l2_vars_B[l2_counter] <- variable
       l2_counter <- l2_counter + 1
     } else {
-      l1_vars_B[l1_counter] <- names(temp_data_number[x])
+      l1_vars_B[l1_counter] <- variable
       l1_counter <- l1_counter + 1
     }
-    x <- x + 1 # iterate the counter
+
   }
 
   # Step 4: pull variable names for L1 predictors with random slopes into a variable called random_slope_vars_B
@@ -442,35 +465,39 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   }
 
-  # Update temp_data_number to include the interaction vars
-
-  cluster_var <- all_vars[length(all_vars)]
-
-  temp_data_number_interactions_B <- data %>%
-    dplyr::filter(!!data[, cluster_var] == as.character(number))
-
   # Step 5: determine value of centeredwithincluster
 
+  # (a) group data
+
+  data_grouped <- data %>%
+    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+
   if (is.null(l1_vars_B)) {
-    centeredwithincluster <- TRUE   # default to cwc = TRUE if there are no L1 vars
+    centeredwithincluster <- TRUE
   } else {
-    for (var in l1_vars_B) {
+    for (variable in l1_vars_B) {
 
-      # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number_interactions_B %>%
-        dplyr::summarize(
-          sum = sum(temp_data_number_interactions_B[var])
-        ) %>%
-        dplyr::select(sum)
+      # for each group for the given variable, sum all values
+      t <- data_grouped %>%
+        dplyr::select(cluster_variable, variable) %>%
+        dplyr::group_map(~ sum(.))
 
-      # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
-      #   then the column is centered within cluster
-      if (temp_sum < 0.0000001) {
+      # establish temporary tracker
+      temp_tracker <- 0
+
+      # sum all of the sums
+      for (i in t) {
+        temp_tracker <- temp_tracker + i
+      }
+
+      # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
+      if (temp_tracker < 0.0000001) {
         centeredwithincluster <- TRUE
       } else {
-        centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
-        break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
+        centeredwithincluster <- FALSE
+        break # break if even one variable is not CWC, because the r2mlm_manual function will need to center everything anyways
       }
+
     }
   }
 
@@ -562,12 +589,12 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # i) Pull all variable names from the formula
   all_vars <- all.vars(formula(modelA))
 
-  # in nlme, formula(modelA) doesn't return grouping var, but we'll need that later on, so let's grab it here
+  # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
   full_formula <- all.vars(asOneFormula(modelA))
-  grouping_var <- full_formula[length(full_formula)]
+  cluster_variable <- full_formula[length(full_formula)]
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)
-  all_vars[length(all_vars) + 1] <- grouping_var
+  all_vars[length(all_vars) + 1] <- cluster_variable
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
   # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
@@ -595,38 +622,45 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   temp_data <- data %>%
     dplyr::select(tidyselect::all_of(all_vars)) # this pulls a df of all variables and values used in the modelA
 
-  # (b) Isolate the largest group from the dataframe, which you'll use to test variances of variables to sort into l1 and l2 lists
-  number <- temp_data %>%
-    dplyr::group_by_at(formula_length) %>% #group by the clustering variable, which is the last variable in the df (by virtue of how formula(modelA) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
-    dplyr::count() %>%
-    dplyr::ungroup() %>% #have to ungroup because otherwise top_n will return n rows from each group, rather than n groups
-    dplyr::top_n(1) %>% # returns the ID and N of the largest group
-    dplyr::pull(1) # returns the number of the group that you'll use for your variance check
+  # (b) group dataset by clustering variable
+  temp_data_grouped <- temp_data %>%
+    dplyr::group_by_at(formula_length) #group by the clustering variable, which is the last variable in the df (by virtue of how formula(model) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
 
-  # (c) If there is more than one largest group, just pick the first one
+  # (c) define variables you'll need
 
-  if (length(number) > 1) {
-    number <- number[1]
-  }
+  # all variables to sort into L1 and L2
+  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
 
-  # (d) Filter temp_data by the number you extracted in 3b
-  temp_data_number <- temp_data %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(temp_data[formula_length] == as.character(number)) #temp_data[formula_length] is the column that holds the clustering variable
+  # set counters
+  l1_counter <- 1
+  l2_counter <- 1
 
-  # (e) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
-  x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars_A)
-  l1_counter <- 1 # setting a counter for adding to l1_vars_A list
-  l2_counter <- 1 # setting a counter for adding to l2_vars_A list
-  while (x < formula_length) {
-    if (var(temp_data_number[x]) == 0) {
-      l2_vars_A[l2_counter] <- names(temp_data_number[x])
+  # (d) loop through all variables in grouped dataset
+
+  for (variable in all_vars_except_cluster_and_outcome) {
+
+    # calculate variance for each cluster
+    t <- temp_data_grouped %>%
+      dplyr::select(cluster_variable, variable) %>%
+      dplyr::group_map(~ var(.))
+
+    # variable to track variance
+    variance_tracker <- 0
+
+    # add up the variance from each cluster
+    for (i in t) {
+      variance_tracker <- variance_tracker + i
+    }
+
+    # if the sum of variance is 0, then each cluster has 0 variance, so it's an L2 variable
+    if (variance_tracker == 0) {
+      l2_vars_A[l2_counter] <- variable
       l2_counter <- l2_counter + 1
     } else {
-      l1_vars_A[l1_counter] <- names(temp_data_number[x])
+      l1_vars_A[l1_counter] <- variable
       l1_counter <- l1_counter + 1
     }
-    x <- x + 1 # iterate the counter
+
   }
 
   # Step 4: pull variable names for L1 predictors with random slopes into a variable called random_slope_vars_A
@@ -683,65 +717,44 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
   }
 
-  # Update temp_data_number to include the interaction vars
-
-  cluster_var <- all_vars[length(all_vars)]
-
-  temp_data_number_interactions_A <- data %>%
-    dplyr::filter(!!data[, cluster_var] == as.character(number)) # sort data by cluster variable
-
   # Step 5: determine value of centeredwithincluster
 
+  # (a) group data
+
+  data_grouped <- data %>%
+    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+
   if (is.null(l1_vars_A)) {
-    centeredwithincluster <- TRUE   # default to cwc = TRUE if there are no L1 vars
+    centeredwithincluster <- TRUE
   } else {
-    for (var in l1_vars_A) {
+    for (variable in l1_vars_A) {
 
-      # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number_interactions_A %>%
-        dplyr::summarize(
-          sum = sum(temp_data_number_interactions_A[var])
-        ) %>%
-        dplyr::select(sum)
+      # for each group for the given variable, sum all values
+      t <- data_grouped %>%
+        dplyr::select(cluster_variable, variable) %>% # select cluster_variable and variable (the former to prevent "Adding missing grouping variables" printout)
+        dplyr::group_map(~ sum(.))
 
-      # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
-      #   then the column is centered within cluster
-      if (temp_sum < 0.0000001) {
+      # establish temporary tracker
+      temp_tracker <- 0
+
+      # sum all of the sums
+      for (i in t) {
+        temp_tracker <- temp_tracker + i
+      }
+
+      # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
+      if (temp_tracker < 0.0000001) {
         centeredwithincluster <- TRUE
       } else {
-        centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
-        break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
+        centeredwithincluster <- FALSE
+        break # break if even one variable is not CWC, because the r2mlm_manual function will need to center everything anyways
       }
+
     }
   }
 
-  # Step 5: determine value of centeredwithincluster
-
-  if (is.null(l1_vars_A)) {
-    centeredwithincluster <- TRUE   # default to cwc = TRUE if there are no L1 vars
-  } else {
-    for (var in l1_vars_A) {
-
-      # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number %>%
-        dplyr::summarize(
-          sum = sum(temp_data_number[var])
-        ) %>%
-        dplyr::select(sum)
-
-      # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
-      #   then the column is centered within cluster
-      if (temp_sum < 0.0000001) {
-        centeredwithincluster <- TRUE
-      } else {
-        centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
-        break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
-      }
-    }
-  }
-
-  # Step 5: pull column numbers for _covs variables
-  # 5a) within_covs (l1 variables)
+  # Step 6: pull column numbers for _covs variables
+  # 6a) within_covs (l1 variables)
   # for (each value in l1_vars_A list) {match(value, names(data))}
   within_A <- c()
   i = 0
@@ -751,7 +764,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     within_A[[i]] <- tmp
   }
 
-  # 5b) pull column numbers for between_covs (l2 variables)
+  # 6b) pull column numbers for between_covs (l2 variables)
   between_A <- c()
   i = 1
   for (var in l2_vars_A) {
@@ -760,7 +773,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     i = i + 1
   }
 
-  # 5c) pull column numbers for random_covs (l1 variables with random slopes)
+  # 6c) pull column numbers for random_covs (l1 variables with random slopes)
   random_A <- c()
   i = 1
   for (var in random_slope_vars_A) {
@@ -769,8 +782,8 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     i = i + 1
   }
 
-  # Step 6: pull gamma values (fixed slopes)
-  # 6a) gamma_w, fixed slopes for L1 variables (from l1_vars_A list)
+  # Step 7: pull gamma values (fixed slopes)
+  # 7a) gamma_w, fixed slopes for L1 variables (from l1_vars_A list)
   gammaw_A <- c()
   i = 1
   for (var in l1_vars_A) {
@@ -778,7 +791,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     i = i + 1
   }
 
-  # 6b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
+  # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab_A <- c()
   if (has_intercept == TRUE) {
     gammab_A[[1]] <- nlme::fixef(modelA)[1]
@@ -791,11 +804,11 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     i = i + 1
   }
 
-  # Step 7: Tau matrix
+  # Step 8: Tau matrix
 
   tau_A <- nlme::getVarCov(modelA)
 
-  # Step 8: sigma^2 value, Rij
+  # Step 9: sigma^2 value, Rij
 
   sigma2_A <- modelA$sigma^2
 
@@ -813,12 +826,12 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # i) Pull all variable names from the formula
   all_vars <- all.vars(formula(modelB))
 
-  # in nlme, formula(modelB) doesn't return grouping var, but we'll need that later on, so let's grab it here
+  # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
   full_formula <- all.vars(asOneFormula(modelB))
-  grouping_var <- full_formula[length(full_formula)]
+  cluster_variable <- full_formula[length(full_formula)]
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)
-  all_vars[length(all_vars) + 1] <- grouping_var
+  all_vars[length(all_vars) + 1] <- cluster_variable
   formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
 
   # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
@@ -846,40 +859,46 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   temp_data <- data %>%
     dplyr::select(tidyselect::all_of(all_vars)) # this pulls a df of all variables and values used in the modelB
 
-  # (b) Isolate the largest group from the dataframe, which you'll use to test variances of variables to sort into l1 and l2 lists
-  number <- temp_data %>%
-    dplyr::group_by_at(formula_length) %>% #group by the clustering variable, which is the last variable in the df (by virtue of how formula(modelB) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
-    dplyr::count() %>%
-    dplyr::ungroup() %>% #have to ungroup because otherwise top_n will return n rows from each group, rather than n groups
-    dplyr::top_n(1) %>% # returns the ID and N of the largest group
-    dplyr::pull(1) # returns the number of the group that you'll use for your variance check
+  # (b) group dataset by clustering variable
+  temp_data_grouped <- temp_data %>%
+    dplyr::group_by_at(formula_length) #group by the clustering variable, which is the last variable in the df (by virtue of how formula(model) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
 
-  # (c) If there is more than one largest group, just pick the first one
+  # (c) define variables you'll need
 
-  if (length(number) > 1) {
-    number <- number[1]
-  }
+  # all variables to sort into L1 and L2
+  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
 
-  # (d) Filter temp_data by the number you extracted in 3b
-  temp_data_number <- temp_data %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(temp_data[formula_length] == as.character(number)) #temp_data[formula_length] is the column that holds the clustering variable
+  # set counters
+  l1_counter <- 1
+  l2_counter <- 1
 
-  # (e) Iterate through temp_data_number, calculating the variance for each variable in all_vars, and then sorting by whether variance is 0 (l2) or non-zero (l1)
-  x <- 2 # setting a counter overall, starting at 2 to skip the outcome variable (which is otherwise var1 in l1_vars_B)
-  l1_counter <- 1 # setting a counter for adding to l1_vars_B list
-  l2_counter <- 1 # setting a counter for adding to l2_vars_B list
-  while (x < formula_length) {
-    if (var(temp_data_number[x]) == 0) {
-      l2_vars_B[l2_counter] <- names(temp_data_number[x])
+  # (d) loop through all variables in grouped dataset
+
+  for (variable in all_vars_except_cluster_and_outcome) {
+
+    # calculate variance for each cluster
+    t <- temp_data_grouped %>%
+      dplyr::select(cluster_variable, variable) %>%
+      dplyr::group_map(~ var(.))
+
+    # variable to track variance
+    variance_tracker <- 0
+
+    # add up the variance from each cluster
+    for (i in t) {
+      variance_tracker <- variance_tracker + i
+    }
+
+    # if the sum of variance is 0, then each cluster has 0 variance, so it's an L2 variable
+    if (variance_tracker == 0) {
+      l2_vars_B[l2_counter] <- variable
       l2_counter <- l2_counter + 1
     } else {
-      l1_vars_B[l1_counter] <- names(temp_data_number[x])
+      l1_vars_B[l1_counter] <- variable
       l1_counter <- l1_counter + 1
     }
-    x <- x + 1 # iterate the counter
-  }
 
+  }
   # Step 4: pull variable names for L1 predictors with random slopes into a variable called random_slope_vars_B
 
   temp_cov_list <- nlme::ranef(modelB)
@@ -934,40 +953,44 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
   }
 
-  # Update temp_data_number to include the interaction vars
-
-  cluster_var <- all_vars[length(all_vars)]
-
-  temp_data_number_interactions_B <- data %>%
-    dplyr::filter(!!data[, cluster_var] == as.character(number)) # sort data by cluster variable
-
   # Step 5: determine value of centeredwithincluster
 
+  # (a) group data
+
+  data_grouped <- data %>%
+    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+
   if (is.null(l1_vars_B)) {
-    centeredwithincluster <- TRUE   # default to cwc = TRUE if there are no L1 vars
+    centeredwithincluster <- TRUE
   } else {
-    for (var in l1_vars_B) {
+    for (variable in l1_vars_B) {
 
-      # Sum the l1 column at hand (var in l1_vars)
-      temp_sum <- temp_data_number_interactions_B %>%
-        dplyr::summarize(
-          sum = sum(temp_data_number_interactions_B[var])
-        ) %>%
-        dplyr::select(sum)
+      # for each group for the given variable, sum all values
+      t <- data_grouped %>%
+        dplyr::select(cluster_variable, variable) %>% # select cluster_variable and variable (the former to prevent "Adding missing grouping variables" printout)
+        dplyr::group_map(~ sum(.))
 
-      # If that sum is approximately equal to zero (i.e., less than a very small number, to account for floating point issues),
-      #   then the column is centered within cluster
-      if (temp_sum < 0.0000001) {
+      # establish temporary tracker
+      temp_tracker <- 0
+
+      # sum all of the sums
+      for (i in t) {
+        temp_tracker <- temp_tracker + i
+      }
+
+      # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
+      if (temp_tracker < 0.0000001) {
         centeredwithincluster <- TRUE
       } else {
-        centeredwithincluster <- FALSE # If the sum is non-zero, then the column is not CWC
-        break # so break out of the for loop because if at least one L1 var is not CWC, then the variables will need to be centered by the r2mlm function
+        centeredwithincluster <- FALSE
+        break # break if even one variable is not CWC, because the r2mlm_manual function will need to center everything anyways
       }
+
     }
   }
 
-  # Step 5: pull column numbers for _covs variables
-  # 5a) within_covs (l1 variables)
+  # Step 6: pull column numbers for _covs variables
+  # 6a) within_covs (l1 variables)
   # for (each value in l1_vars_B list) {match(value, names(data))}
   within_B <- c()
   i = 0
@@ -977,7 +1000,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     within_B[[i]] <- tmp
   }
 
-  # 5b) pull column numbers for between_covs (l2 variables)
+  # 6b) pull column numbers for between_covs (l2 variables)
   between_B <- c()
   i = 1
   for (var in l2_vars_B) {
@@ -986,7 +1009,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     i = i + 1
   }
 
-  # 5c) pull column numbers for random_covs (l1 variables with random slopes)
+  # 6c) pull column numbers for random_covs (l1 variables with random slopes)
   random_B <- c()
   i = 1
   for (var in random_slope_vars_B) {
@@ -995,8 +1018,8 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     i = i + 1
   }
 
-  # Step 6: pull gamma values (fixed slopes)
-  # 6a) gamma_w, fixed slopes for L1 variables (from l1_vars_B list)
+  # Step 7: pull gamma values (fixed slopes)
+  # 7a) gamma_w, fixed slopes for L1 variables (from l1_vars_B list)
   gammaw_B <- c()
   i = 1
   for (var in l1_vars_B) {
@@ -1004,7 +1027,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     i = i + 1
   }
 
-  # 6b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
+  # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab_B <- c()
   if (has_intercept == TRUE) {
     gammab_B[[1]] <- nlme::fixef(modelB)[1]
@@ -1017,15 +1040,15 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     i = i + 1
   }
 
-  # Step 7: Tau matrix
+  # Step 8: Tau matrix
 
   tau_B <- nlme::getVarCov(modelB)
 
-  # Step 8: sigma^2 value, Rij
+  # Step 9: sigma^2 value, Rij
 
   sigma2_B <- modelB$sigma^2
 
-  # Step 9: input everything into r2mlm_
+  # Step 10: input everything into r2mlm_
 
   r2mlm_comp_manual(as.data.frame(data), within_covs_modA = within_A, between_covs_modA = between_A, random_covs_modA = random_A, gamma_w_modA = gammaw_A, gamma_b_modA = gammab_A, Tau_modA = tau_A, sigma2_modA = sigma2_A, within_covs_modB = within_B, between_covs_modB = between_B, random_covs_modB = random_B, gamma_w_modB = gammaw_B, gamma_b_modB = gammab_B, Tau_modB = tau_B, sigma2_modB = sigma2_B)
 
