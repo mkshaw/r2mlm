@@ -52,7 +52,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
 #' @importFrom stringr str_split_fixed
-#' @importFrom rlang :=
+#' @importFrom rlang := .data
 #'
 #'
 #' @export
@@ -138,7 +138,7 @@ r2mlm_lmer <- function(model) {
 
     # calculate variance for each cluster
     t <- temp_data_grouped %>%
-      dplyr::select(cluster_variable, variable) %>%
+      dplyr::select(tidyselect::all_of(cluster_variable), variable) %>%
       dplyr::group_map(~ var(.))
 
     # variable to track variance
@@ -219,7 +219,7 @@ r2mlm_lmer <- function(model) {
   # (a) group data
 
   data_grouped <- data %>%
-    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+    dplyr::group_by(.data[[cluster_variable]]) # see "Indirection" here for explanation of this group_by formatting: https://dplyr.tidyverse.org/articles/programming.html
 
   if (is.null(l1_vars)) {
     centeredwithincluster <- TRUE
@@ -389,7 +389,7 @@ r2mlm_nlme <- function(model) {
 
     # calculate variance for each cluster
     t <- temp_data_grouped %>%
-      dplyr::select(cluster_variable, variable) %>%
+      dplyr::select(tidyselect::all_of(cluster_variable), variable) %>%
       dplyr::group_map(~ var(.))
 
     # variable to track variance
@@ -470,7 +470,7 @@ r2mlm_nlme <- function(model) {
   # (a) group data
 
   data_grouped <- data %>%
-    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+    dplyr::group_by(.data[[cluster_variable]]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
 
   if (is.null(l1_vars)) {
     centeredwithincluster <- TRUE

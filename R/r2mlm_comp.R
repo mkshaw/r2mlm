@@ -60,7 +60,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
 #' @importFrom stringr str_split_fixed
-#' @importFrom rlang :=
+#' @importFrom rlang := .data
 #'
 #' @export
 
@@ -233,7 +233,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   # (a) group data
 
   data_grouped <- data %>%
-    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+    dplyr::group_by(.data[[cluster_variable]]) # see "Indirection" here for explanation of this group_by formatting: https://dplyr.tidyverse.org/articles/programming.html
 
   if (is.null(l1_vars_A)) {
     centeredwithincluster <- TRUE
@@ -470,7 +470,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   # (a) group data
 
   data_grouped <- data %>%
-    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+    dplyr::group_by(.data[[cluster_variable]]) # see "Indirection" here for explanation of this group_by formatting: https://dplyr.tidyverse.org/articles/programming.html
 
   if (is.null(l1_vars_B)) {
     centeredwithincluster <- TRUE
@@ -722,7 +722,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # (a) group data
 
   data_grouped <- data %>%
-    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+    dplyr::group_by(.data[[cluster_variable]]) # see "Indirection" here for explanation of this group_by formatting: https://dplyr.tidyverse.org/articles/programming.html
 
   if (is.null(l1_vars_A)) {
     centeredwithincluster <- TRUE
@@ -958,7 +958,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # (a) group data
 
   data_grouped <- data %>%
-    dplyr::group_by(data[cluster_variable]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+    dplyr::group_by(.data[[cluster_variable]]) # see "Indirection" here for explanation of this group_by formatting: https://dplyr.tidyverse.org/articles/programming.html
 
   if (is.null(l1_vars_B)) {
     centeredwithincluster <- TRUE
