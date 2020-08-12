@@ -75,6 +75,16 @@ r2mlm <- function(model) {
 
 r2mlm_lmer <- function(model) {
 
+  # Step 0: throw error if model contains higher-order terms
+  temp_formula <- formula(model)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term, you must compute it in advance and include it as a column in your dataset.")
+    }
+  }
+
   # Step 1: pull data
 
   data <- fortify.merMod(model)
@@ -319,6 +329,16 @@ r2mlm_lmer <- function(model) {
 # 3 r2mlm_nlme helper function --------------------------------------------
 
 r2mlm_nlme <- function(model) {
+
+  # Step 0: throw error if model contains higher-order terms
+  temp_formula <- formula(model)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term, you must compute it in advance and include it as a column in your dataset.")
+    }
+  }
 
   # Step 1: pull data
 

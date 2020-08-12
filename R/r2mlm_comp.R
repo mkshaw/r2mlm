@@ -86,6 +86,16 @@ r2mlm_comp <- function(modelA, modelB) {
 
 r2mlm_comp_lmer <- function(modelA, modelB) {
 
+  # Step 0: throw error if model contains higher-order terms
+  temp_formula <- formula(modelA)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term, you must compute it in advance and include it as a column in your dataset.")
+    }
+  }
+
   # r2mlm_ wrapper sub-functions, but for modelA
 
   # Step 1: pull data
@@ -330,6 +340,17 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   # r2mlm_ sub-functions, for model B
 
+  # Step 0: throw error if model contains higher-order terms
+  temp_formula <- formula(modelB)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term, you must compute it in advance and include it as a column in your dataset.")
+    }
+  }
+
+
   # Step 2: has_intercept
 
   if ((terms(modelB) %>% attr("intercept")) == 1) {
@@ -571,6 +592,17 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 r2mlm_comp_nlme <- function(modelA, modelB) {
 
   # EXTRACT FOR MODEL A
+
+  # Step 0: throw error if model contains higher-order terms
+  temp_formula <- formula(modelA)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term, you must compute it in advance and include it as a column in your dataset.")
+    }
+  }
+
 
   # Step 1: pull data
 
@@ -814,6 +846,18 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
 
   # EXTRACT FOR MODEL B
+
+  # Step 0: throw error if model contains higher-order terms
+  temp_formula <- formula(modelB)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term, you must compute it in advance and include it as a column in your dataset.")
+    }
+  }
+
+  # Step 1: determine intercept
 
   if ((terms(modelB) %>% attr("intercept")) == 1) {
     has_intercept = TRUE
