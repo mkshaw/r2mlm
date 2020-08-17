@@ -282,7 +282,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   for (var in l1_vars_A) {
     i = i + 1
     tmp <- match(var, names(data))
-    within_A[[i]] <- tmp
+    within_A[i] <- tmp
   }
 
   # 5b) pull column numbers for between_covs (l2 variables)
@@ -290,7 +290,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   i = 1
   for (var in l2_vars_A) {
     tmp <- match(var, names(data))
-    between_A[[i]] <- tmp
+    between_A[i] <- tmp
     i = i + 1
   }
 
@@ -299,7 +299,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   i = 1
   for (var in random_slope_vars_A) {
     tmp <- match(var, names(data))
-    random_A[[i]] <- tmp
+    random_A[i] <- tmp
     i = i + 1
   }
 
@@ -308,20 +308,20 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   gammaw_A <- c()
   i = 1
   for (var in l1_vars_A) {
-    gammaw_A[[i]] <- lme4::fixef(modelA)[var]
+    gammaw_A[i] <- lme4::fixef(modelA)[var]
     i = i + 1
   }
 
   # 6b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab_A <- c()
   if (has_intercept == TRUE) {
-    gammab_A[[1]] <- lme4::fixef(modelA)[1]
+    gammab_A[1] <- lme4::fixef(modelA)[1]
     i = 2
   } else {
     i = 1
   }
   for (var in l2_vars_A) {
-    gammab_A[[i]] <- lme4::fixef(modelA)[var]
+    gammab_A[i] <- lme4::fixef(modelA)[var]
     i = i + 1
   }
 
@@ -530,7 +530,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   for (var in l1_vars_B) {
     i = i + 1
     tmp <- match(var, names(data))
-    within_B[[i]] <- tmp
+    within_B[i] <- tmp
   }
 
   # 5b) pull column numbers for between_covs (l2 variables)
@@ -538,7 +538,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   i = 1
   for (var in l2_vars_B) {
     tmp <- match(var, names(data))
-    between_B[[i]] <- tmp
+    between_B[i] <- tmp
     i = i + 1
   }
 
@@ -547,7 +547,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   i = 1
   for (var in random_slope_vars_B) {
     tmp <- match(var, names(data))
-    random_B[[i]] <- tmp
+    random_B[i] <- tmp
     i = i + 1
   }
 
@@ -556,20 +556,20 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   gammaw_B <- c()
   i = 1
   for (var in l1_vars_B) {
-    gammaw_B[[i]] <- lme4::fixef(modelB)[var]
+    gammaw_B[i] <- lme4::fixef(modelB)[var]
     i = i + 1
   }
 
   # 6b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab_B <- c()
   if (has_intercept == TRUE) {
-    gammab_B[[1]] <- lme4::fixef(modelB)[1]
+    gammab_B[1] <- lme4::fixef(modelB)[1]
     i = 2
   } else {
     i = 1
   }
   for (var in l2_vars_B) {
-    gammab_B[[i]] <- lme4::fixef(modelB)[var]
+    gammab_B[i] <- lme4::fixef(modelB)[var]
     i = i + 1
   }
 
@@ -793,7 +793,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   for (var in l1_vars_A) {
     i = i + 1
     tmp <- match(var, names(data))
-    within_A[[i]] <- tmp
+    within_A[i] <- tmp
   }
 
   # 6b) pull column numbers for between_covs (l2 variables)
@@ -801,7 +801,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   i = 1
   for (var in l2_vars_A) {
     tmp <- match(var, names(data))
-    between_A[[i]] <- tmp
+    between_A[i] <- tmp
     i = i + 1
   }
 
@@ -810,7 +810,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   i = 1
   for (var in random_slope_vars_A) {
     tmp <- match(var, names(data))
-    random_A[[i]] <- tmp
+    random_A[i] <- tmp
     i = i + 1
   }
 
@@ -819,20 +819,20 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   gammaw_A <- c()
   i = 1
   for (var in l1_vars_A) {
-    gammaw_A[[i]] <- nlme::fixef(modelA)[var]
+    gammaw_A[i] <- nlme::fixef(modelA)[var]
     i = i + 1
   }
 
   # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab_A <- c()
   if (has_intercept == TRUE) {
-    gammab_A[[1]] <- nlme::fixef(modelA)[1]
+    gammab_A[1] <- nlme::fixef(modelA)[1]
     i = 2
   } else {
     i = 1
   }
   for (var in l2_vars_A) {
-    gammab_A[[i]] <- nlme::fixef(modelA)[var]
+    gammab_A[i] <- nlme::fixef(modelA)[var]
     i = i + 1
   }
 
@@ -1041,7 +1041,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   for (var in l1_vars_B) {
     i = i + 1
     tmp <- match(var, names(data))
-    within_B[[i]] <- tmp
+    within_B[i] <- tmp
   }
 
   # 6b) pull column numbers for between_covs (l2 variables)
@@ -1049,7 +1049,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   i = 1
   for (var in l2_vars_B) {
     tmp <- match(var, names(data))
-    between_B[[i]] <- tmp
+    between_B[i] <- tmp
     i = i + 1
   }
 
@@ -1058,7 +1058,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   i = 1
   for (var in random_slope_vars_B) {
     tmp <- match(var, names(data))
-    random_B[[i]] <- tmp
+    random_B[i] <- tmp
     i = i + 1
   }
 
@@ -1067,20 +1067,20 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   gammaw_B <- c()
   i = 1
   for (var in l1_vars_B) {
-    gammaw_B[[i]] <- fixef(modelB)[var]
+    gammaw_B[i] <- fixef(modelB)[var]
     i = i + 1
   }
 
   # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab_B <- c()
   if (has_intercept == TRUE) {
-    gammab_B[[1]] <- nlme::fixef(modelB)[1]
+    gammab_B[1] <- nlme::fixef(modelB)[1]
     i = 2
   } else {
     i = 1
   }
   for (var in l2_vars_B) {
-    gammab_B[[i]] <- nlme::fixef(modelB)[var]
+    gammab_B[i] <- nlme::fixef(modelB)[var]
     i = i + 1
   }
 
