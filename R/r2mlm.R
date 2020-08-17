@@ -20,7 +20,6 @@
 #'   model.
 #'
 #' @examples
-#' \dontrun{
 #' # Using lme4 for your model
 #'
 #' model_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
@@ -38,7 +37,6 @@
 #'                   method = "REML")
 #'
 #' r2mlm(model_nlme)
-#' }
 #'
 #' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
 #'   S. K. (2019). Quantifying explained variance in multilevel models: An

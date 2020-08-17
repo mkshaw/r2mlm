@@ -17,7 +17,6 @@
 #'   models.
 #'
 #' @examples
-#' \dontrun{
 #' # Using lme4 for your model
 #'
 #' # Model A
@@ -50,7 +49,6 @@
 #'                   method = "REML")
 #'
 #' r2mlm_comp(modelA_nlme, modelB_nlme)
-#' }
 #'
 #'
 #' @family r2mlm model comparison functions
