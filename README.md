@@ -105,5 +105,3 @@ This framework of variance explained assumes the following:
 2.  Normal outcome variable;
 3.  Homoscedastic residual variances at both level 1 and level 2;
 4.  Level-1 predictors are centered within cluster.
-
-## Getting Help
