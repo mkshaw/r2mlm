@@ -20,7 +20,6 @@
 #'   model.
 #'
 #' @examples
-#' \dontrun{
 #' # Using lme4 for your model
 #'
 #' model_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
@@ -38,7 +37,6 @@
 #'                   method = "REML")
 #'
 #' r2mlm(model_nlme)
-#' }
 #'
 #' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
 #'   S. K. (2019). Quantifying explained variance in multilevel models: An
@@ -268,7 +266,7 @@ r2mlm_lmer <- function(model) {
   for (var in l1_vars) {
     i = i + 1
     tmp <- match(var, names(data))
-    within[[i]] <- tmp
+    within[i] <- tmp
   }
 
   # 6b) pull column numbers for between_covs (l2 variables)
@@ -276,7 +274,7 @@ r2mlm_lmer <- function(model) {
   i = 1
   for (var in l2_vars) {
     tmp <- match(var, names(data))
-    between[[i]] <- tmp
+    between[i] <- tmp
     i = i + 1
   }
 
@@ -285,7 +283,7 @@ r2mlm_lmer <- function(model) {
   i = 1
   for (var in random_slope_vars) {
     tmp <- match(var, names(data))
-    random[[i]] <- tmp
+    random[i] <- tmp
     i = i + 1
   }
 
@@ -294,20 +292,20 @@ r2mlm_lmer <- function(model) {
   gammaw <- c()
   i = 1
   for (var in l1_vars) {
-    gammaw[[i]] <- fixef(model)[var]
+    gammaw[i] <- fixef(model)[var]
     i = i + 1
   }
 
   # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab <- c()
   if (has_intercept == TRUE) {
-    gammab[[1]] <- fixef(model)[1]
+    gammab[1] <- fixef(model)[1]
     i = 2
   } else {
     i = 1
   }
   for (var in l2_vars) {
-    gammab[[i]] <- fixef(model)[var]
+    gammab[i] <- fixef(model)[var]
     i = i + 1
   }
 
@@ -529,7 +527,7 @@ r2mlm_nlme <- function(model) {
   for (var in l1_vars) {
     i = i + 1
     tmp <- match(var, names(data))
-    within[[i]] <- tmp
+    within[i] <- tmp
   }
 
   # 6b) pull column numbers for between_covs (l2 variables)
@@ -537,7 +535,7 @@ r2mlm_nlme <- function(model) {
   i = 1
   for (var in l2_vars) {
     tmp <- match(var, names(data))
-    between[[i]] <- tmp
+    between[i] <- tmp
     i = i + 1
   }
 
@@ -546,7 +544,7 @@ r2mlm_nlme <- function(model) {
   i = 1
   for (var in random_slope_vars) {
     tmp <- match(var, names(data))
-    random[[i]] <- tmp
+    random[i] <- tmp
     i = i + 1
   }
 
@@ -555,20 +553,20 @@ r2mlm_nlme <- function(model) {
   gammaw <- c()
   i = 1
   for (var in l1_vars) {
-    gammaw[[i]] <- nlme::fixef(model)[var]
+    gammaw[i] <- nlme::fixef(model)[var]
     i = i + 1
   }
 
   # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab <- c()
   if (has_intercept == TRUE) {
-    gammab[[1]] <- nlme::fixef(model)[1]
+    gammab[1] <- nlme::fixef(model)[1]
     i = 2
   } else {
     i = 1
   }
   for (var in l2_vars) {
-    gammab[[i]] <- nlme::fixef(model)[var]
+    gammab[i] <- nlme::fixef(model)[var]
     i = i + 1
   }
 
