@@ -1,13 +1,28 @@
-#' Compute R-squared values for two hierarchical multilevel models, with manual input.
+#' Compute R-squared differences between two multilevel models, manually
+#' inputting parameter estimates.
 #'
 #' \code{r2mlm_comp_manual} reads in raw data and multilevel model (MLM)
-#' parameter estimates from two separate models under comparison (Model A and
-#' Model B), and outputs all R-squared measures for both models. It also
-#' produces side-by-side graphical comparisons of the R-squared measures for
-#' Model A vs. Model B, that can be used to visualize changes in each measure
-#' across models.
-#'
-#' Details: assumes cwc, hierarchy/nesting
+#' parameter estimates from two separate models under comparison (designated
+#' Model A and Model B), and outputs all R-squared measures in the Rights and
+#' Sterba (2019) framework for both models, as well as R-squared differences
+#' between the two models. Definitions of these R-squared difference measures
+#' are provided in Rights & Sterba (2020) Table 1; importantly, to detect the
+#' impact of a specific kind of term (e.g., the kind of term added to Model A to
+#' form Model B), a particular target single-source R-squared difference measure
+#' from this framework is used. For instructions on how to identify which target
+#' single-source R-squared difference measure to interpret to detect the impact
+#' of which kind of term that distinguishes Model A from B, see Rights and
+#' Sterba (2020) Table 2. Additionally, this function produces side-by-side
+#' graphical comparisons of the R-squared measures for Model A vs. Model B that
+#' can be used to visualize changes in each measure across models. This function
+#' assumes all level-1 predictors are cluster-mean-centered for reasons
+#' described in Rights & Sterba (2020). Any number of level-1 and/or level-2
+#' predictors is supported and any of the level-1 predictors can have random
+#' slopes. This function can be used with either the hierarchical or the
+#' simultaneous model-building approach described in Rights and Sterba (2020).
+#' This function can also be used with either nested or non-nested model
+#' comparisons (in which R-squared estimates for Model A are subtracted from
+#' those for Model B).
 #'
 #' @param data Dataset with rows denoting observations and columns denoting
 #'   variables.
@@ -35,24 +50,40 @@
 #'   random_covs).
 #' @param sigma2_modA,sigma2_modB Level-1 residual variance.
 #'
-#' @return If inputs are valid models, then the output will be a list and
+#' @return If the inputs are valid models, then the output will be a list and
 #'   associated graphical representation of R-squared decompositions.
 #'
 #' @examples
 #'
-#' modelA <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
-#' control_m + s_t_ratio + (1 | schoolID), data = teachsat, REML = TRUE)
+#' # Model A: no "salary" components included
 #'
-#' modelB <- lmer(satisfaction ~ 1 + control_c + control_m + s_t_ratio + (1
-#' | schoolID), data = teachsat, REML = TRUE)
+#' modelA <- lmer(satisfaction ~ 1 + control_c + control_m + s_t_ratio + (1 +
+#' control_c | schoolID), data = teachsat, REML = TRUE, control =
+#' lmerControl(optimizer = "bobyqa"))
 #'
-#' r2mlm_comp_manual(data = teachsat, within_covs_modA = c(5, 4),
-#' between_covs_modA = c(7, 6, 8), random_covs_modA = NULL, gamma_w_modA =
-#' c(1.52595, 2.66361), gamma_b_modA = c(19.68596, 1.43791, 3.65461, -0.36449),
-#' Tau_modA = matrix(c(18.28349), 1, 1), sigma2_modA = 47.74, within_covs_modB =
-#' c(4), between_covs_modB = c(6, 8), random_covs_modB = NULL, gamma_w_modB =
-#' c(2.67877), gamma_b_modB = c(19.68596, 3.61712, -0.42340), Tau_modB =
-#' matrix(c(26.77), 1, 1), sigma2_modB = 56.99)
+#' # Model B: full model with "salary" components included
+#'
+#' modelB <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m + control_m
+#' + s_t_ratio + (1 + salary_c + control_c | schoolID), data = teachsat, REML =
+#' TRUE, control = lmerControl(optimizer = "bobyqa"))
+#'
+#' r2mlm_comp_manual(data = teachsat, within_covs_modA = c(4), between_covs_modA
+#' = c(6, 8), random_covs_modA = c(4), gamma_w_modA = c(2.68263), gamma_b_modA =
+#' c(19.6868596, 3.61309, -0.42385), Tau_modA = matrix(c(26.882, -0.298, -0.298,
+#' 3.536), 2, 2), sigma2_modA = 53.522, within_covs_modB = c(5, 4),
+#' between_covs_modB = c(7, 6, 8), random_covs_modB = c(5, 4), gamma_w_modB =
+#' c(1.55160, 2.69277), gamma_b_modB = c(19.68596, 1.45138, 3.68630, -0.37230),
+#' Tau_modB = matrix(c(18.548, -0.676, -0.396, -0.676, 1.065, -0.143, -0.396,
+#' -0.143, 3.612), 3, 3), sigma2_modB = 39.821)
+#'
+#' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
+#'   S. K. (2019). Quantifying explained variance in multilevel models: An
+#'   integrative framework for defining R-squared measures. Psychological
+#'   Methods, 24(3), 309–338.}
+#' @seealso \href{https://doi.org/10.1080/00273171.2019.1660605}{Rights, J. D., &
+#'   Sterba, S. K. (2020). New recommendations on the use of R-squared
+#'   differences in multilevel model comparisons. Multivariate Behavioral
+#'   Research.}
 #'
 #' @family r2mlm model comparison functions
 #'

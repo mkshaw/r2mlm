@@ -1,10 +1,18 @@
-#' Compute R-squared values for multilevel models.
+#' Compute R-squared values for multilevel models, automatically inputting
+#' parameter estimates.
 #'
-#' \code{r2mlm} reads in a multilevel model (MLM) generated using
+#' \code{r2mlm} reads in a multilevel model (MLM) object generated using
 #' \code{\link[lme4]{lmer}} or \code{\link[nlme]{nlme}}, and outputs all
-#' relevant R-square measures and barchart decompositions. Any number of level-1
-#' and/or level-2 predictors is supported. Any of the level-1 predictors can
-#' have random slopes.
+#' relevant R-squared measures from the Rights and Sterba (2019) framework of
+#' multilevel model R-squared measures, which can be visualized together as a
+#' set using the outputted barchart decompositions of outcome variance. That is,
+#' when predictors are cluster-mean-centered, all R-squared measures from Rights
+#' & Sterba (2019) Table 1 and decompositions from Rights & Sterba (2019) Figure
+#' 1 are outputted. When predictors are not cluster-mean-centered, the total
+#' R-squared measures from Rights & Sterba (2019) Table 5, as well as barchart
+#' decompositions are outputted. Any number of level-1 and/or level-2 predictors
+#' is supported. Any of the level-1 predictors can have random slopes.
+
 #'
 #' \code{r2mlm} first determines whether a given model was generated using
 #' \code{\link[lme4]{lmer}} or \code{\link[nlme]{nlme}}, then passes the model
@@ -14,17 +22,20 @@
 #' @param model A model generated using \code{\link[lme4]{lmer}} or
 #'   \code{\link[nlme]{nlme}}.
 #'
-#' @return If input is a valid model, then the output will be a list and
-#'   associated graphical representation of R-squared decompositions. If model
-#'   is not valid, it will return an error prompting the user to input a valid
-#'   model.
+#' @return If the input is a valid model, then the output will be a list and
+#'   associated graphical representation of R-squared decompositions. If the
+#'   model is not valid, it will return an error prompting the user to input a
+#'   valid model.
 #'
 #' @examples
 #' # Using lme4 for your model
 #'
-#' model_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
-#' control_m + s_t_ratio + (1 | schoolID), data = teachsat, REML =
-#' TRUE)
+#' # Note that the "bobyqa" optimizer is required for this particular model to
+#' converge
+#'
+#' model_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m + control_m +
+#' s_t_ratio + (1 + salary_c + control_c| schoolID), data = teachsat, REML =
+#' TRUE, control = lmerControl(optimizer = "bobyqa"))
 #'
 #' r2mlm(model_lme4)
 #'
@@ -32,7 +43,7 @@
 #'
 #' model_nlme <- lme(satisfaction ~ 1 + salary_c + control_c + salary_m +
 #'                   control_m + s_t_ratio,
-#'                   random = ~ 1 | schoolID,
+#'                   random = ~ 1 + salary_c + control_c | schoolID,
 #'                   data = teachsat,
 #'                   method = "REML")
 #'
@@ -79,7 +90,7 @@ r2mlm_lmer <- function(model) {
 
   for (bool in grepl_array) {
     if (bool == TRUE) {
-      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term, you must compute it in advance and include it as a column in your dataset.")
+      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term such as x^2 or x^3, you must manually include them as separate columns in your dataset.")
     }
   }
 

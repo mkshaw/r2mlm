@@ -1,9 +1,17 @@
-#' Manually compute R-squared values for multilevel models.
+#' Compute R-squared values for multilevel models, manually inputting parameter
+#' estimates.
 #'
 #' \code{r2mlm_manual} takes as input raw data and parameter estimates from a
-#' multilevel model, and outputs all relevant R-square measures and barchart
-#' decompositions. Any number of level-1 and/or level-2 predictors is supported.
-#' Any of the level-1 predictors can have random slopes.
+#' multilevel model, and outputs all relevant R-squared measures from the Rights
+#' and Sterba (2019) framework of R-squared measures for multilevel models,
+#' which can be visualized together as a set using the outputted barchart
+#' decompositions of outcome variance. That is, when predictors are
+#' cluster-mean-centered, all R-squared measures from Rights & Sterba (2019)
+#' Table 1 and decompositions from Rights & Sterba (2019) Figure 1 are
+#' outputted. When predictors are not cluster-mean-centered, the total
+#' R-squareds from Rights & Sterba (2019) Table 5, as well as barchart
+#' decompositions are outputted. Any number of level-1 and/or level-2 predictors
+#' is supported. Any of the level-1 predictors can have random slopes.
 #'
 #' @param data Dataset with rows denoting observations and columns denoting
 #'   variables.
@@ -39,19 +47,24 @@
 #'   output only total decompositions (see Description above); set to TRUE by
 #'   default.
 #'
-#' @return If input is valid model, then the output will be a list and
-#'   associated graphical representation of R-squared decompositions. If model
-#'   is not valid, it will return an error.
+#' @return If the input is valid, then the output will be a list and associated
+#'   graphical representation of R-squared decompositions. If the input is not
+#'   valid, it will return an error.
 #'
 #' @examples
-#' model <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
-#' control_m + s_t_ratio + (1 | schoolID), data = teachsat, REML =
-#' TRUE)
 #'
-#' r2mlm_manual(data = teachsat, within_covs = c(5, 4), between_covs = c(7, 6, 8),
-#' random_covs = NULL, gamma_w = c(1.52595, 2.66361), gamma_b = c(19.68596,
-#' 1.43791, 3.65461, -0.36449), Tau = matrix(c(18.28349), 1, 1), sigma2 = 47.74,
-#' has_intercept = TRUE, clustermeancentered = TRUE)
+#' # Note, the bobyqa optimizer is required for this particular model to
+#' converge in lme4
+#'
+#' model <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m + control_m
+#' + s_t_ratio + (1 + salary_c + control_c | schoolID), data = teachsat, REML =
+#' TRUE, control = lmerControl(optimizer = "bobyqa"))
+#'
+#' r2mlm_manual(data = teachsat, within_covs = c(5, 4), between_covs = c(7, 6,
+#' 8), random_covs =  c(5, 4), gamma_w = c(1.55160, 2.69277), gamma_b =
+#' c(19.68596,1.45138 , 3.68630, -0.37230), Tau = matrix(c(18.548, -0.676,
+#' -0.396, -0.676, 1.064, -0.143, -0.039, -0.143, 3.612), 3, 3), sigma2 =
+#' 39.821, has_intercept = TRUE, clustermeancentered = TRUE)
 #'
 #' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
 #'   S. K. (2019). Quantifying explained variance in multilevel models: An

@@ -2,7 +2,8 @@
 % Please edit documentation in R/r2mlm_comp.R
 \name{r2mlm_comp}
 \alias{r2mlm_comp}
-\title{Compute R-squared values for two hierarchical multilevel models.}
+\title{Compute R-squared differences between two multilevel models, automatically
+inputting parameter estimates.}
 \usage{
 r2mlm_comp(modelA, modelB)
 }
@@ -11,60 +12,88 @@ r2mlm_comp(modelA, modelB)
 \code{\link[nlme]{nlme}}.}
 }
 \value{
-If inputs are valid models, then the output will be a list and
-  associated graphical representation of R-squared decompositions. If models
-  are not valid, it will return an error prompting the user to input valid
-  models.
+If the inputs are valid models, then the output will be a list and
+  associated graphical representation of R-squared decompositions. If the
+  models are not valid, the function will return an error prompting the user
+  to input valid models.
 }
 \description{
-\code{r2mlm_comp} reads in two multilevel models (MLM) generated using
-\code{\link[lme4]{lmer}} or \code{\link[nlme]{nlme}}, and outputs all
-R-squared measures for both models. It also produces side-by-side graphical
-comparisons of the R-squared measures for Model A vs. Model B, that can be
-used to visualize changes in each measure across models.
+\code{r2mlm_comp} reads in two multilevel models (MLMs) (generated using
+\code{\link[lme4]{lmer}} or \code{\link[nlme]{nlme}}) under comparison
+(designated Model A and Model B), and outputs all R-squared measures in the
+Rights and Sterba (2019) framework for both models, as well as R-squared
+differences between the two models. Definitions of these R-squared difference
+measures are provided in Rights & Sterba (2020) Table 1; importantly, to
+detect the impact of a specific kind of term (e.g., the kind of term added to
+Model A to form Model B), a particular target single-source R-squared
+difference measure from this framework is used. For instructions on how to
+identify which target single-source R-squared difference measure to interpret
+to detect the impact of which kind of term that distinguishes Model A from B,
+see Rights and Sterba (2020) Table 2. Additionally, this function produces
+side-by-side graphical comparisons of the R-squared measures for Model A vs.
+Model B that can be used to visualize changes in each measure across models.
+This function assumes all level-1 predictors are cluster-mean-centered, for
+reasons described in Rights & Sterba (2020). Any number of level-1 and/or
+level-2 predictors is supported and any of the level-1 predictors can have
+random slopes. This function can be used with either the hierarchical or the
+simultaneous model-building approach described in Rights and Sterba (2020).
+This function can be used with either nested or non-nested model comparisons
+(in which R-squared estimates for Model A are subtracted from those for Model
+B).
 }
 \details{
-#' Details: assumes cwc, hierarchy/nesting, both models lmer or both nlme, no mixing and matching
+Assumes that both models are fit with lmer or both models are fit with nlme.
 }
 \examples{
-\dontrun{
 # Using lme4 for your model
+# Note: the "bobyqa" optimizer is required for these particular models to
+converge
 
-# Model A
+# Model A, no "salary" components included
 
-modelA_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
-control_m + s_t_ratio + (1 | schoolID), data = teachsat, REML = TRUE)
+modelA_lme4 <- lmer(satisfaction ~ 1 + control_c + control_m + s_t_ratio + (1
++ control_c | schoolID), data = teachsat, REML = TRUE, control =
+lmerControl(optimizer = "bobyqa"))
 
-# Model B, "salary" components removed
+# Model B, full model with "salary" components included
 
-modelB_lme4 <- lmer(satisfaction ~ 1 + control_c + control_m + s_t_ratio + (1
-| schoolID), data = teachsat, REML = TRUE)
+modelB_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
+control_m + s_t_ratio + (1 + salary_c + control_c | schoolID), data =
+teachsat, REML = TRUE, control = lmerControl(optimizer = "bobyqa"))
 
 r2mlm_comp(modelA_lme4, modelB_lme4)
 
 # Using nlme for your model
 
-# Model A
+# Model A, no "salary" components included
 
-modelA_nlme <- lme(satisfaction ~ 1 + salary_c + control_c + salary_m +
-                  control_m + s_t_ratio,
-                  random = ~ 1 | schoolID,
+modelA_nlme <- lme(satisfaction ~ 1 + control_c + control_m + s_t_ratio,
+                  random = ~ 1 + control_c | schoolID,
                   data = teachsat,
                   method = "REML")
 
-# Model B, "salary" components removed
+# Model B, full model with "salary" components included
 
-modelB_nlme <- lme(satisfaction ~ 1 + control_c + control_m + s_t_ratio,
-                  random = ~ 1 | schoolID,
+modelB_nlme <- lme(satisfaction ~ 1 + salary_c + control_c + salary_m +
+                  control_m + s_t_ratio,
+                  random = ~ 1 _ salary_c + control_c | schoolID,
                   data = teachsat,
                   method = "REML")
 
 r2mlm_comp(modelA_nlme, modelB_nlme)
-}
-
 
 }
 \seealso{
+\href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
+  S. K. (2019). Quantifying explained variance in multilevel models: An
+  integrative framework for defining R-squared measures. Psychological
+  Methods, 24(3), 309–338.}
+
+\href{https://doi.org/10.1080/00273171.2019.1660605}{Rights, J. D., &
+  Sterba, S. K. (2020). New recommendations on the use of R-squared
+  differences in multilevel model comparisons. Multivariate Behavioral
+  Research.}
+
 Other r2mlm model comparison functions: 
 \code{\link{r2mlm_comp_manual}()}
 }
