@@ -46,8 +46,7 @@ Assumes that both models are fit with lmer or both models are fit with nlme.
 }
 \examples{
 # Using lme4 for your model
-# Note: the "bobyqa" optimizer is required for these particular models to
-converge
+# The "bobyqa" optimizer is required for these particular models to converge
 
 # Model A, no "salary" components included
 
@@ -76,7 +75,7 @@ modelA_nlme <- lme(satisfaction ~ 1 + control_c + control_m + s_t_ratio,
 
 modelB_nlme <- lme(satisfaction ~ 1 + salary_c + control_c + salary_m +
                   control_m + s_t_ratio,
-                  random = ~ 1 _ salary_c + control_c | schoolID,
+                  random = ~ 1 + salary_c + control_c | schoolID,
                   data = teachsat,
                   method = "REML")
 

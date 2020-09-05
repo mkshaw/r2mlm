@@ -39,8 +39,7 @@ model, and pass that information to \code{\link{r2mlm_manual}}.
 \examples{
 # Using lme4 for your model
 
-# Note that the "bobyqa" optimizer is required for this particular model to
-converge
+# The "bobyqa" optimizer is required for this particular model to converge
 
 model_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m + control_m +
 s_t_ratio + (1 + salary_c + control_c| schoolID), data = teachsat, REML =

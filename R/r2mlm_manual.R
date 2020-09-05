@@ -53,8 +53,7 @@
 #'
 #' @examples
 #'
-#' # Note, the bobyqa optimizer is required for this particular model to
-#' converge in lme4
+#' # The bobyqa optimizer is required for this model to converge in lme4
 #'
 #' model <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m + control_m
 #' + s_t_ratio + (1 + salary_c + control_c | schoolID), data = teachsat, REML =
