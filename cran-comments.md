@@ -6,7 +6,12 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs.
 
-There was 1 NOTE:
+There were 2 NOTEs:
+
+* checking for future file timestamps (710ms)
+   unable to verify current time
+   
+Based on my Google searching, I believe this is an issue with worldclockapi.com.
 
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: 'Mairead Shaw <mairead.shaw@mail.mcgill.ca>'
