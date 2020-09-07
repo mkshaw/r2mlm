@@ -59,7 +59,8 @@
 #' modelA_nlme <- lme(satisfaction ~ 1 + control_c + control_m + s_t_ratio,
 #'                   random = ~ 1 + control_c | schoolID,
 #'                   data = teachsat,
-#'                   method = "REML")
+#'                   method = "REML",
+#'                   control = (msMaxIter = 100))
 #'
 #' # Model B, full model with "salary" components included
 #'
@@ -67,7 +68,8 @@
 #'                   control_m + s_t_ratio,
 #'                   random = ~ 1 + salary_c + control_c | schoolID,
 #'                   data = teachsat,
-#'                   method = "REML")
+#'                   method = "REML",
+#'                   control = (msMaxIter = 100))
 #'
 #' r2mlm_comp(modelA_nlme, modelB_nlme)
 #'
