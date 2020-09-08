@@ -45,6 +45,9 @@ library(r2mlm)
 # Generate the model, in this case with lme4:
 model <- lmer(satisfaction ~ 1 + salary_c + s_t_ratio + (1 + salary_c | schoolID), data = teachsat, REML = TRUE)
 
+# Adjust plot margins
+par(mar = c(7.1, 6.1, 6.1, 4.1))
+
 # Generate R-squared measures for that model:
 r2mlm(model)
 ```
