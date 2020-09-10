@@ -54,7 +54,8 @@ model_nlme <- lme(satisfaction ~ 1 + salary_c + control_c + salary_m +
                   random = ~ 1 + salary_c + control_c | schoolID,
                   data = teachsat,
                   method = "REML",
-                  control = lmeControl(optimizer = "bobyqa"))
+                  control = lmeControl(maxIter = 100, msMaxIter = 100,
+                  optimizer = "bobyqa"))
 
 r2mlm(model_nlme)
 
