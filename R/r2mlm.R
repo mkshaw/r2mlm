@@ -45,8 +45,7 @@
 #'                   random = ~ 1 + salary_c + control_c | schoolID,
 #'                   data = teachsat,
 #'                   method = "REML",
-#'                   control = lmeControl(maxIter = 100, msMaxIter = 100,
-#'                   optimizer = "bobyqa"))
+#'                   control = lmeControl(opt = "optim"))
 #'
 #' r2mlm(model_nlme)
 #'

@@ -60,8 +60,7 @@
 #'                   random = ~ 1 + control_c | schoolID,
 #'                   data = teachsat,
 #'                   method = "REML",
-#'                   control = lmeControl(maxIter = 100, msMaxIter = 100,
-#'                   optimizer = "bobyqa"))
+#'                   control = lmeControl(opt = "optim"))
 #'
 #' # Model B, full model with "salary" components included
 #'
@@ -70,8 +69,7 @@
 #'                   random = ~ 1 + salary_c + control_c | schoolID,
 #'                   data = teachsat,
 #'                   method = "REML",
-#'                   control = lmeControl(maxIter = 100, msMaxIter = 100,
-#'                   optimizer = "bobyqa"))
+#'                   control = lmeControl(opt = "optim"))
 #'
 #' r2mlm_comp(modelA_nlme, modelB_nlme)
 #'
