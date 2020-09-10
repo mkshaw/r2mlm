@@ -67,7 +67,7 @@ library(r2mlm)
 model <- lmer(satisfaction ~ 1 + salary_c + s_t_ratio + (1 + salary_c | schoolID), data = teachsat, REML = TRUE)
 
 # Adjust plot margins
-par(mar = c(7.1, 6.1, 6.1, 4.1))
+par(mar = c(6.75, 10.5, 2.625, 10.5))
 
 # Generate R-squared measures for that model:
 r2mlm(model)

@@ -39,14 +39,14 @@ devtools::install_github("mkshaw/r2mlm")
 
 Suppose you have a dataset consisting of teachers nested within schools. A researcher could specify a multilevel model with teacher job satisfaction as the outcome, which is predicted by the level-1 predictor teacher salary (here school-mean-centered) and the level-2 predictor student-teacher ratio. Suppose the multilevel model included a random intercept as well as a random slope of teacher salary, and included normally-distributed, homoscedastic level-1 residuals. The researcher could then obtain the following output (see r2mlm function for further details). 
 
-```{r example}
+```{r example, fig.width = 8.5, fig.height = 6.5}
 library(r2mlm)
 
 # Generate the model, in this case with lme4:
 model <- lmer(satisfaction ~ 1 + salary_c + s_t_ratio + (1 + salary_c | schoolID), data = teachsat, REML = TRUE)
 
 # Adjust plot margins
-par(mar = c(7.1, 6.1, 6.1, 4.1))
+par(mar = c(6.75, 10.5, 2.625, 10.5))
 
 # Generate R-squared measures for that model:
 r2mlm(model)
