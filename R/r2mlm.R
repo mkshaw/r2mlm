@@ -90,7 +90,7 @@ r2mlm_lmer <- function(model) {
 
   for (bool in grepl_array) {
     if (bool == TRUE) {
-      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term such as x^2 or x^3, you must manually include them as separate columns in your dataset.")
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
     }
   }
 
@@ -345,7 +345,7 @@ r2mlm_nlme <- function(model) {
 
   for (bool in grepl_array) {
     if (bool == TRUE) {
-      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term, you must compute it in advance and include it as a column in your dataset.")
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
     }
   }
 

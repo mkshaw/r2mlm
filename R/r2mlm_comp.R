@@ -121,7 +121,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   for (bool in grepl_array) {
     if (bool == TRUE) {
-      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term such as x^2 or x^3, you must manually include them as separate columns in your dataset.")
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
     }
   }
 
@@ -375,7 +375,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   for (bool in grepl_array) {
     if (bool == TRUE) {
-      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term such as x^2 or x^3, you must manually include them as separate columns in your dataset.")
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
     }
   }
 
@@ -628,7 +628,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
   for (bool in grepl_array) {
     if (bool == TRUE) {
-      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term such as x^2 or x^3, you must manually include them as separate columns in your dataset.")
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
     }
   }
 
@@ -882,7 +882,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
   for (bool in grepl_array) {
     if (bool == TRUE) {
-      stop("Higher-order terms created with I() syntax are not currently accepted. To include a higher-order term such as x^2 or x^3, you must manually include them as separate columns in your dataset.")
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
     }
   }
 
