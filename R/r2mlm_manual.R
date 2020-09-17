@@ -4,12 +4,12 @@
 #' \code{r2mlm_manual} takes as input raw data and parameter estimates from a
 #' multilevel model, and outputs all relevant R-squared measures from the Rights
 #' and Sterba (2019) framework of R-squared measures for multilevel models,
-#' which can be visualized together as a set using the outputted barchart
+#' which can be visualized together as a set using the outputted bar chart
 #' decompositions of outcome variance. That is, when predictors are
 #' cluster-mean-centered, all R-squared measures from Rights & Sterba (2019)
 #' Table 1 and decompositions from Rights & Sterba (2019) Figure 1 are
 #' outputted. When predictors are not cluster-mean-centered, the total
-#' R-squareds from Rights & Sterba (2019) Table 5, as well as barchart
+#' R-squareds from Rights & Sterba (2019) Table 5, as well as bar chart
 #' decompositions are outputted. Any number of level-1 and/or level-2 predictors
 #' is supported. Any of the level-1 predictors can have random slopes.
 #'
@@ -170,7 +170,7 @@ r2mlm_manual <- function(data, within_covs, between_covs, random_covs,
     rownames(R2_table) <- c("f1", "f2", "v", "m", "f", "fv", "fvm")
     colnames(R2_table) <- c("total", "within", "between")
   }
-  ##barchart
+  ##bar chart
   if(clustermeancentered == TRUE){
     contributions_stacked <- matrix(c(decomp_fixed_within, decomp_fixed_between, decomp_varslopes, decomp_varmeans, decomp_sigma,
                                       decomp_fixed_within_w, 0, decomp_varslopes_w, 0, decomp_sigma_w,

@@ -22,11 +22,11 @@ If the input is a valid model, then the output will be a list and
 \code{\link[lme4]{lmer}} or \code{\link[nlme]{nlme}}, and outputs all
 relevant R-squared measures from the Rights and Sterba (2019) framework of
 multilevel model R-squared measures, which can be visualized together as a
-set using the outputted barchart decompositions of outcome variance. That is,
+set using the outputted bar chart decompositions of outcome variance. That is,
 when predictors are cluster-mean-centered, all R-squared measures from Rights
 & Sterba (2019) Table 1 and decompositions from Rights & Sterba (2019) Figure
 1 are outputted. When predictors are not cluster-mean-centered, the total
-R-squared measures from Rights & Sterba (2019) Table 5, as well as barchart
+R-squared measures from Rights & Sterba (2019) Table 5, as well as bar chart
 decompositions are outputted. Any number of level-1 and/or level-2 predictors
 is supported. Any of the level-1 predictors can have random slopes.
 }
