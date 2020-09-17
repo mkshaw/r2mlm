@@ -6,7 +6,7 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs.
 
-There were 2 NOTEs:
+There were 3 NOTEs:
 
 * checking for future file timestamps (710ms)
    unable to verify current time
@@ -19,6 +19,12 @@ Maintainer: 'Mairead Shaw <mairead.shaw@mail.mcgill.ca>'
 New submission
 
 This is my first CRAN submission.
+
+* Possibly mis-spelled words in DESCRIPTION:
+  
+    Sterba (12:16, 21:46)
+    
+Sterba is the last name of one of the authors of this package and a paper referenced in the documentation.
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.
