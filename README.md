@@ -20,9 +20,9 @@ multilevel model. The implementation of this framework of measures for
 comparing multilevel models using R-squared differences is described in
 Rights & Sterba (2020). The functions in this package allow users to
 input either model objects obtained from
-[lme4](https://cran.r-project.org/web/packages/lme4/index.html) or
-[nlme](https://cran.r-project.org/web/packages/nlme/index.html), or to
-manually input model parameter estimates.
+[lme4](https://cran.r-project.org/package=lme4) or
+[nlme](https://cran.r-project.org/package=nlme), or to manually input
+model parameter estimates.
 
 ## Installation
 
