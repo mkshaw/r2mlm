@@ -1,3 +1,10 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* Fixed README URLs to be in canonical form
+* Added DOIs to references in the Description field of the DESCRIPTION file
+
 ## Test environments
 * local macOS install, R 3.6.3
 * ubuntu 16.04 (on travis-ci), R 4.0.0
