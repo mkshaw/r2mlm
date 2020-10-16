@@ -70,6 +70,17 @@
 
 r2mlm <- function(model) {
 
+  # throw error if model contains higher-order terms
+  temp_formula <- formula(model)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
+    }
+  }
+
+  # call appropriate r2mlm helper function
   if (typeof(model) == "list") {
     r2mlm_nlme(model)
   } else if (typeof(model) == "S4") {
@@ -84,7 +95,7 @@ r2mlm <- function(model) {
 
 r2mlm_lmer <- function(model) {
 
-  # Step 0: throw error if model contains higher-order terms
+  # Step 0:
   temp_formula <- formula(model)
   grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
 
@@ -338,16 +349,6 @@ r2mlm_lmer <- function(model) {
 # 3 r2mlm_nlme helper function --------------------------------------------
 
 r2mlm_nlme <- function(model) {
-
-  # Step 0: throw error if model contains higher-order terms
-  temp_formula <- formula(model)
-  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
-
-  for (bool in grepl_array) {
-    if (bool == TRUE) {
-      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
-    }
-  }
 
   # Step 1: pull data
 
