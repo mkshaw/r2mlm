@@ -34,7 +34,6 @@ Depends:
     R (>= 3.2.0)
 RoxygenNote: 7.1.0
 Suggests: 
-    broom,
     testthat,
     Matrix
 URL: https://github.com/mkshaw/r2mlm

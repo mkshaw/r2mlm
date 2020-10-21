@@ -95,16 +95,6 @@ r2mlm <- function(model) {
 
 r2mlm_lmer <- function(model) {
 
-  # Step 0:
-  temp_formula <- formula(model)
-  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
-
-  for (bool in grepl_array) {
-    if (bool == TRUE) {
-      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
-    }
-  }
-
   # Step 1: pull data
 
   data <- fortify.merMod(model)
@@ -283,31 +273,16 @@ r2mlm_lmer <- function(model) {
   # Step 6: pull column numbers for _covs variables
   # 6a) within_covs (l1 variables)
   # for (each value in l1_vars list) {match(value, names(data))}
-  within <- c()
-  i = 0
-  for (var in l1_vars) {
-    i = i + 1
-    tmp <- match(var, names(data))
-    within[i] <- tmp
-  }
+
+  within <- get_covs(l1_vars, data)
 
   # 6b) pull column numbers for between_covs (l2 variables)
-  between <- c()
-  i = 1
-  for (var in l2_vars) {
-    tmp <- match(var, names(data))
-    between[i] <- tmp
-    i = i + 1
-  }
+
+  between <- get_covs(l2_vars, data)
 
   # 6c) pull column numbers for random_covs (l1 variables with random slopes)
-  random <- c()
-  i = 1
-  for (var in random_slope_vars) {
-    tmp <- match(var, names(data))
-    random[i] <- tmp
-    i = i + 1
-  }
+
+  random <- get_covs(random_slope_vars, data)
 
   # Step 7: pull gamma values (fixed slopes)
   # 7a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
@@ -534,31 +509,13 @@ r2mlm_nlme <- function(model) {
   # Step 6: pull column numbers for _covs variables
   # 6a) within_covs (l1 variables)
   # for (each value in l1_vars list) {match(value, names(data))}
-  within <- c()
-  i = 0
-  for (var in l1_vars) {
-    i = i + 1
-    tmp <- match(var, names(data))
-    within[i] <- tmp
-  }
+  within <- get_covs(l1_vars, data)
 
   # 6b) pull column numbers for between_covs (l2 variables)
-  between <- c()
-  i = 1
-  for (var in l2_vars) {
-    tmp <- match(var, names(data))
-    between[i] <- tmp
-    i = i + 1
-  }
+  between <- get_covs(l2_vars, data)
 
   # 6c) pull column numbers for random_covs (l1 variables with random slopes)
-  random <- c()
-  i = 1
-  for (var in random_slope_vars) {
-    tmp <- match(var, names(data))
-    random[i] <- tmp
-    i = i + 1
-  }
+  random <- get_covs(random_slope_vars, data)
 
   # Step 7: pull gamma values (fixed slopes)
   # 7a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
