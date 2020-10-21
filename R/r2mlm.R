@@ -161,6 +161,19 @@ r2mlm_lmer <- function(model) {
       dplyr::select(tidyselect::all_of(cluster_variable), variable) %>%
       dplyr::group_map(~ var(.))
 
+    # var returns NA if group only 1 row. Replace with 0
+    counter = 1
+
+    while (counter < length(t)) {
+
+      if (is.na(t[[counter]])) {
+        t[[counter]] <- 0
+      }
+
+      counter <- counter + 1
+
+    }
+
     # variable to track variance
     variance_tracker <- 0
 
@@ -368,6 +381,19 @@ r2mlm_nlme <- function(model) {
     t <- temp_data_grouped %>%
       dplyr::select(tidyselect::all_of(cluster_variable), variable) %>%
       dplyr::group_map(~ var(.))
+
+    # var returns NA if group only 1 row. Replace with 0
+    counter = 1
+
+    while (counter < length(t)) {
+
+      if (is.na(t[[counter]])) {
+        t[[counter]] <- 0
+      }
+
+      counter <- counter + 1
+
+    }
 
     # variable to track variance
     variance_tracker <- 0
