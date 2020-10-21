@@ -2,8 +2,9 @@
 % Please edit documentation in R/utils.R
 \name{get_covs}
 \alias{get_covs}
-\title{Helper functions
-Return the number in the dataframe associated with a given variable name}
+\title{Helper functions.
+get_covs: Return the number in the dataframe associated with a given variable
+name.}
 \usage{
 get_covs(variable_list, data)
 }
@@ -13,6 +14,7 @@ get_covs(variable_list, data)
 \item{data}{Dataset containing those variable names.}
 }
 \description{
-Helper functions
-Return the number in the dataframe associated with a given variable name
+Helper functions.
+get_covs: Return the number in the dataframe associated with a given variable
+name.
 }

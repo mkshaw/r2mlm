@@ -236,38 +236,10 @@ r2mlm_lmer <- function(model) {
 
   # Step 5: determine value of centeredwithincluster
 
-  # (a) group data
-
-  data_grouped <- data %>%
-    dplyr::group_by(.data[[cluster_variable]]) # see "Indirection" here for explanation of this group_by formatting: https://dplyr.tidyverse.org/articles/programming.html
-
   if (is.null(l1_vars)) {
     centeredwithincluster <- TRUE
   } else {
-    for (variable in l1_vars) {
-
-      # for each group for the given variable, sum all values
-      t <- data_grouped %>%
-        dplyr::select(cluster_variable, variable) %>%
-        dplyr::group_map(~ sum(.))
-
-      # establish temporary tracker
-      temp_tracker <- 0
-
-      # sum all of the sums
-      for (i in t) {
-        temp_tracker <- temp_tracker + i
-      }
-
-      # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
-      if (temp_tracker < 0.0000001) {
-        centeredwithincluster <- TRUE
-      } else {
-        centeredwithincluster <- FALSE
-        break # break if even one variable is not CWC, because the r2mlm_manual function will need to center everything anyways
-      }
-
-    }
+    centeredwithincluster <- get_cwc(l1_vars, cluster_variable, data)
   }
 
   # Step 6: pull column numbers for _covs variables
@@ -472,38 +444,10 @@ r2mlm_nlme <- function(model) {
 
   # Step 5: determine value of centeredwithincluster
 
-  # (a) group data
-
-  data_grouped <- data %>%
-    dplyr::group_by(.data[[cluster_variable]]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
-
   if (is.null(l1_vars)) {
     centeredwithincluster <- TRUE
   } else {
-    for (variable in l1_vars) {
-
-      # for each group for the given variable, sum all values
-      t <- data_grouped %>%
-        dplyr::select(cluster_variable, variable) %>% # select cluster_variable and variable (the former to prevent "Adding missing grouping variables" printout)
-        dplyr::group_map(~ sum(.))
-
-      # establish temporary tracker
-      temp_tracker <- 0
-
-      # sum all of the sums
-      for (i in t) {
-        temp_tracker <- temp_tracker + i
-      }
-
-      # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
-      if (temp_tracker < 0.0000001) {
-        centeredwithincluster <- TRUE
-      } else {
-        centeredwithincluster <- FALSE
-        break # break if even one variable is not CWC, because the r2mlm_manual function will need to center everything anyways
-      }
-
-    }
+    centeredwithincluster <- get_cwc(l1_vars, cluster_variable, data)
   }
 
   # Step 6: pull column numbers for _covs variables
