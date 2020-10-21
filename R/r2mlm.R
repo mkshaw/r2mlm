@@ -328,8 +328,7 @@ r2mlm_nlme <- function(model) {
   all_vars <- all.vars(formula(model))
 
   # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
-  full_formula <- all.vars(asOneFormula(model))
-  cluster_variable <- full_formula[length(full_formula)]
+  cluster_variable <- nlme::getGroups(model) %>% attr("label")
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)
   all_vars[length(all_vars) + 1] <- cluster_variable
