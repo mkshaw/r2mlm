@@ -22,6 +22,43 @@ get_covs <- function(variable_list, data) {
 
 }
 
+#' get_random_slope_vars: Return list of variable names with random effects
+#'
+#' @param model A model generated using \code{\link[lme4]{lmer}} or
+#'   \code{\link[nlme]{nlme}}, passed from the calling function.
+#' @param has_intercept Whether or not the model has an intercept
+#' @param calling_function Whether the helper funtion is r2mlm_lme4 or
+#'   r2mlm_nlme.
+
+get_random_slope_vars <- function(model, has_intercept, calling_function) {
+
+  if (calling_function == "lme4") {
+    temp_cov_list <- ranef(model)[[1]]
+  } else if (calling_function == "nlme") {
+    temp_cov_list <- nlme::ranef(model)
+  }
+
+  # determine where to start pulling from the temp_cov_list, depending on whether you need to bypass the `(Intercept)` column
+  if (has_intercept == 1) {
+    running_count <- 2
+  } else {
+    running_count <- 1
+  }
+
+  random_slope_vars <- c()
+  x <- 1 # counter for indexing in random_slope_vars
+
+  # running count less than or equal to list length, so it traverses the entire list (doesn't leave last element off)
+  while (running_count <= length(temp_cov_list)) {
+    random_slope_vars[x] <- names(temp_cov_list[running_count])
+    x <- x + 1
+    running_count <- running_count + 1
+  }
+
+  return(random_slope_vars)
+
+}
+
 #' get_cwc: Determine whether l1_vars are centered within cluster.
 #'
 #' @param l1_vars List of level 1 variables.

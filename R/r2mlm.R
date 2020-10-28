@@ -147,24 +147,7 @@ r2mlm_lmer <- function(model) {
 
   # Step 5) pull variable names for L1 predictors with random slopes into a variable called random_slope_vars
 
-  temp_cov_list <- ranef(model)[[1]]
-
-  # determine where to start pulling from the temp_cov_list, depending on whether you need to bypass the `(Intercept)` column
-  if (has_intercept == 1) {
-    running_count <- 2
-  } else {
-    running_count <- 1
-  }
-
-  random_slope_vars <- c()
-  x <- 1 # counter for indexing in random_slope_vars
-
-  # running count less than or equal to list length, so it traverses the entire list (doesn't leave last element off)
-  while (running_count <= length(temp_cov_list)) {
-    random_slope_vars[x] <- names(temp_cov_list[running_count])
-    x <- x + 1
-    running_count <- running_count + 1
-  }
+  random_slope_vars <- get_random_slope_vars(model, has_intercept, "lme4")
 
   # Step 5: determine value of centeredwithincluster
 
@@ -278,24 +261,7 @@ r2mlm_nlme <- function(model) {
 
   # Step 4: pull variable names for L1 predictors with random slopes into a variable called random_slope_vars
 
-  temp_cov_list <- nlme::ranef(model)
-
-  # determine where to start pulling from the temp_cov_list, depending on whether you need to bypass the `(Intercept)` column
-  if (has_intercept == 1) {
-    running_count <- 2
-  } else {
-    running_count <- 1
-  }
-
-  random_slope_vars <- c()
-  x <- 1 # counter for indexing in random_slope_vars
-
-  # running count less than or equal to list length, so it traverses the entire list (doesn't leave last element off)
-  while (running_count <= length(temp_cov_list)) {
-    random_slope_vars[x] <- names(temp_cov_list[running_count])
-    x <- x + 1
-    running_count <- running_count + 1
-  }
+  random_slope_vars <- get_random_slope_vars(model, has_intercept, "nlme")
 
   # Step 5: determine value of centeredwithincluster
 
