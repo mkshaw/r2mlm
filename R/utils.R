@@ -62,3 +62,86 @@ get_cwc <- function(l1_vars, cluster_variable, data) {
   return(centeredwithincluster)
 
 }
+
+#' get_interaction_vars: Return list of interaction variables
+#'
+#' @param model A model generated using \code{\link[lme4]{lmer}} or
+#'   \code{\link[nlme]{nlme}}, passed from the calling function.
+
+get_interaction_vars <- function(model) {
+
+  interaction_vars <- c()
+  x <- 1
+  for (term in attr(terms(model), "term.labels")) {
+
+    if (grepl(":", term) == TRUE) {
+      interaction_vars[x] <- term
+      x <- x + 1
+    }
+
+  }
+
+  return(interaction_vars)
+
+}
+
+#' sort_variables: Sort predictors into level 1 (variance is non-zero) and level
+#' 2 (variance of 0) variables.
+#'
+#' @param
+
+sort_variables <- function(data, predictors, cluster_variable) {
+
+  l1_vars <- c()
+  l2_vars <- c()
+
+  # * Step 4c) Sort variables into l1_vars and l2_vars
+
+  # set counters
+  l1_counter <- 1
+  l2_counter <- 1
+
+  # * Step 4d) loop through all variables in grouped dataset
+
+  for (variable in predictors) {
+
+    # calculate variance for each cluster
+    t <- data %>%
+      dplyr::select(tidyselect::all_of(cluster_variable), variable) %>%
+      dplyr::group_map(~ var(.))
+
+    # var returns NA if group only 1 row. Replace with 0
+    counter = 1
+
+    while (counter < length(t)) {
+
+      if (is.na(t[[counter]])) {
+        t[[counter]] <- 0
+      }
+
+      counter <- counter + 1
+
+    }
+
+    # variable to track variance
+    variance_tracker <- 0
+
+    # add up the variance from each cluster
+    for (i in t) {
+      variance_tracker <- variance_tracker + i
+    }
+
+    # if each cluster has 0 variance, the sum of variance is 0, so it's an L2 variable
+    if (variance_tracker == 0) {
+      l2_vars[l2_counter] <- variable
+      l2_counter <- l2_counter + 1
+    } else {
+      l1_vars[l1_counter] <- variable
+      l1_counter <- l1_counter + 1
+    }
+
+  }
+
+  return(list("l1_vars" = l1_vars, "l2_vars" = l2_vars))
+
+}
