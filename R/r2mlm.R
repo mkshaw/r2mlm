@@ -131,7 +131,15 @@ r2mlm_lmer <- function(model) {
 
   # * Step 4a) Define variables you'll be sorting
   # take the outcome out of the predictors with [2:length(outcome_and_predictors)], then add interaction terms
-  predictors <- append(outcome_and_predictors[2:length(outcome_and_predictors)], get_interaction_vars(model))
+
+  # sometimes the outcome_and_predictors is only an outcome variable (for the null model). If that's the case, then
+  #     predictors is null, just call get_interaction_vars just in case
+
+  if (length(outcome_and_predictors) == 1) {
+    predictors <- get_interaction_vars(model)
+  } else {
+    predictors <- append(outcome_and_predictors[2:length(outcome_and_predictors)], get_interaction_vars(model))
+  }
 
   # * Step 4b) Create and fill vectors
   l1_vars <- sort_variables(data, predictors, cluster_variable)$l1_vars
@@ -255,7 +263,14 @@ r2mlm_nlme <- function(model) {
   # Step 4) Fill l1 and l2 vectors
 
   # * Step 4a) Define variables you'll be sorting
-  predictors <- append(outcome_and_predictors[2:length(outcome_and_predictors)], get_interaction_vars(model))
+  # sometimes the outcome_and_predictors is only an outcome variable (for the null model). If that's the case, then
+  #     predictors is null, just call get_interaction_vars just in case
+
+  if (length(outcome_and_predictors) == 1) {
+    predictors <- get_interaction_vars(model)
+  } else {
+    predictors <- append(outcome_and_predictors[2:length(outcome_and_predictors)], get_interaction_vars(model))
+  }
 
   # * Step 4b) Create and fill vectors
   l1_vars <- sort_variables(data, predictors, cluster_variable)$l1_vars
