@@ -235,9 +235,9 @@ r2mlm_nlme <- function(model) {
 
   outcome_and_predictors <-  all_variables[1:length(all_variables) - 1] # Pull all variables except for cluster
 
-  for (var in outcome_and_predictors) {
+  for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 
@@ -286,8 +286,8 @@ r2mlm_nlme <- function(model) {
   # 7a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
   gammaw <- c()
   i = 1
-  for (var in l1_vars) {
-    gammaw[i] <- nlme::fixef(model)[var]
+  for (variable in l1_vars) {
+    gammaw[i] <- nlme::fixef(model)[variable]
     i = i + 1
   }
 
@@ -299,8 +299,8 @@ r2mlm_nlme <- function(model) {
   } else {
     i = 1
   }
-  for (var in l2_vars) {
-    gammab[i] <- nlme::fixef(model)[var]
+  for (variable in l2_vars) {
+    gammab[i] <- nlme::fixef(model)[variable]
     i = i + 1
   }
 
