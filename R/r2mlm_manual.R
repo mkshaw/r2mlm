@@ -62,7 +62,7 @@
 #' r2mlm_manual(data = teachsat, within_covs = c(5, 4), between_covs = c(7, 6,
 #' 8), random_covs =  c(5, 4), gamma_w = c(1.55160, 2.69277), gamma_b =
 #' c(19.68596,1.45138 , 3.68630, -0.37230), Tau = matrix(c(18.548, -0.676,
-#' -0.396, -0.676, 1.064, -0.143, -0.039, -0.143, 3.612), 3, 3), sigma2 =
+#' -0.396, -0.676, 1.064, -0.143, -0.396, -0.143, 3.612), 3, 3), sigma2 =
 #' 39.821, has_intercept = TRUE, clustermeancentered = TRUE)
 #'
 #' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
