@@ -14,7 +14,7 @@
 prepare_data <- function(model, calling_function, cluster_variable) {
 
   # Step 1a: pull dataframe associated with model
-  data <- broom::augment(model)
+  data <- broomExtra::augment(model)
 
   # Step 1b: remove the dot variables (.fitted, .resid, .fixed, etc.) from data.
   # lme4 returns way more dot variables

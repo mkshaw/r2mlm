@@ -23,7 +23,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    broom (>= 0.5.6),
+    broomExtra (>= 4.1.0),
     dplyr (>= 0.8.5),
     magrittr (>= 1.5),
     rlang (>= 0.4.6),
