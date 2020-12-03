@@ -149,7 +149,7 @@ r2mlm_lmer <- function(model) {
 
   random_slope_vars <- get_random_slope_vars(model, has_intercept, "lme4")
 
-  # Step 5: determine value of centeredwithincluster
+  # Step 6) determine value of centeredwithincluster
 
   if (is.null(l1_vars)) {
     centeredwithincluster <- TRUE
@@ -157,22 +157,22 @@ r2mlm_lmer <- function(model) {
     centeredwithincluster <- get_cwc(l1_vars, cluster_variable, data)
   }
 
-  # Step 6: pull column numbers for _covs variables
-  # 6a) within_covs (l1 variables)
+  # Step 7) pull column numbers for _covs variables
+  # 7a) within_covs (l1 variables)
   # for (each value in l1_vars list) {match(value, names(data))}
 
   within <- get_covs(l1_vars, data)
 
-  # 6b) pull column numbers for between_covs (l2 variables)
+  # 7b) pull column numbers for between_covs (l2 variables)
 
   between <- get_covs(l2_vars, data)
 
-  # 6c) pull column numbers for random_covs (l1 variables with random slopes)
+  # 7c) pull column numbers for random_covs (l1 variables with random slopes)
 
   random <- get_covs(random_slope_vars, data)
 
-  # Step 7: pull gamma values (fixed slopes)
-  # 7a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
+  # Step 8) pull gamma values (fixed slopes)
+  # 8a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
   gammaw <- c()
   i = 1
   for (variable in l1_vars) {
@@ -180,7 +180,7 @@ r2mlm_lmer <- function(model) {
     i = i + 1
   }
 
-  # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
+  # 8b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab <- c()
   if (has_intercept == TRUE) {
     gammab[1] <- fixef(model)[1]
@@ -193,16 +193,16 @@ r2mlm_lmer <- function(model) {
     i = i + 1
   }
 
-  # Step 8: Tau matrix, results from VarCorr(model)
+  # Step 9) Tau matrix, results from VarCorr(model)
 
   vcov <- VarCorr(model)
   tau <- as.matrix(Matrix::bdiag(vcov))
 
-  # Step 9: sigma^2 value, Rij
+  # Step 10) sigma^2 value, Rij
 
   sigma2 <- getME(model, "sigma")^2
 
-  # Step 10: input everything into r2MLM
+  # Step 11) input everything into r2MLM
 
   r2mlm_manual(as.data.frame(data), within_covs = within, between_covs = between, random_covs = random, gamma_w = gammaw, gamma_b = gammab, Tau = tau, sigma2 = sigma2, has_intercept = has_intercept, clustermeancentered = centeredwithincluster)
 
