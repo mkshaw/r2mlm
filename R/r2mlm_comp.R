@@ -95,27 +95,9 @@
 
 # 1 r2mlm_comp_wrapper -----------------------------------------------------
 
-r2mlm_comp <- function(modelA, modelB) {
+r2mlm_comp <- function(modelA, modelB, data = NULL) {
 
-  if (typeof(modelA) != typeof(modelB)) {
-    stop("Your models must be of the same type, either both lme4 or both nlme models.")
-  }
-
-  if (typeof(modelA) == "list") {
-    r2mlm_comp_nlme(modelA, modelB)
-  } else if (typeof(modelA) == "S4") {
-    r2mlm_comp_lmer(modelA, modelB)
-  } else {
-    stop("Error. You must input models generated using either the lme4 or nlme package.")
-  }
-
-}
-
-# 2 r2mlm_comp_lmer --------------------------------------------------------
-
-r2mlm_comp_lmer <- function(modelA, modelB) {
-
-  # Step 0: throw error if model contains higher-order terms
+  # throw error if model contains higher-order terms
   temp_formula <- formula(modelA)
   grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
 
@@ -125,13 +107,37 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
     }
   }
 
+  temp_formula <- formula(modelB)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
+    }
+  }
+
+  # make sure models are same type, call helper functions
+  if (typeof(modelA) != typeof(modelB)) {
+    stop("Your models must be of the same type, either both lme4 or both nlme models.")
+  }
+
+  if (typeof(modelA) == "list") {
+    r2mlm_comp_nlme(modelA, modelB, data)
+  } else if (typeof(modelA) == "S4") {
+    r2mlm_comp_lmer(modelA, modelB, data)
+  } else {
+    stop("Error. You must input models generated using either the lme4 or nlme package.")
+  }
+
+}
+
+# 2 r2mlm_comp_lmer --------------------------------------------------------
+
+r2mlm_comp_lmer <- function(modelA, modelB, data) {
+
   # r2mlm_ wrapper sub-functions, but for modelA
 
-  # Step 1: pull data
-
-  data <- fortify.merMod(modelA)
-
-  # Step 2: has_intercept
+  # Step 1) check if model has_intercept
 
   if ((terms(modelA) %>% attr("intercept")) == 1) {
     has_intercept = TRUE
@@ -139,29 +145,47 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
     has_intercept = FALSE
   }
 
-  # Step 3: Pull l1 var names into a variable called l1_vars_A, and vice versa for l2 var names
+  # Step 2) Pull all variable names from the formula
+  all_variables <- all.vars(formula(modelA))
+  cluster_variable <- all_variables[length(all_variables)] # pull cluster, we'll need it later
 
-  # i) Pull all variable names from the formula
-  all_vars <- all.vars(formula(modelA))
-  formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
-  cluster_variable <- all_vars[formula_length] # pull cluster, we'll need it later
+  # Step 3a) pull and prepare data
 
-  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+  if(is.null(data)) {
+    data = check_hierarchical(modelA, modelB, "lme4", cluster_variable)
+  } else {
+    data = na.omit(data) # if data provided, use that
+  }
+
+  # Step 3b) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
   # a) Pull all variables except for cluster
 
-  all_vars_except_cluster <- all_vars[1:(length(all_vars) - 1)]
+  outcome_and_predictors <- all_variables[1:(length(all_variables) - 1)]
 
   # b) If any of those variables is non-numeric, then throw an error
 
-  for (var in all_vars_except_cluster) {
+  for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 
   }
 
-  # iii) Create vectors to fill
+  # Step 4) Fill l1 and l2 vectors
+
+  # * Step 4a) Define variables you'll be sorting
+  # take the outcome out of the predictors with [2:length(outcome_and_predictors)], then add interaction terms
+
+  # sometimes the outcome_and_predictors is only an outcome variable (for the null model). If that's the case, then
+  #     predictors is null, just call get_interaction_vars just in case
+
+  if (length(outcome_and_predictors) == 1) {
+    predictors <- get_interaction_vars(model)
+  } else {
+    predictors <- append(outcome_and_predictors[2:length(outcome_and_predictors)], get_interaction_vars(model))
+  }
+
   l1_vars_A <- c()
   l2_vars_A <- c()
 
@@ -178,7 +202,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   # (c) define variables you'll need
 
   # all variables to sort into L1 and L2
-  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
+  all_vars_except_cluster_and_outcome <- outcome_and_predictors[-1]
 
   # set counters
   l1_counter <- 1
@@ -369,17 +393,6 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
 
   # r2mlm_ sub-functions, for model B
 
-  # Step 0: throw error if model contains higher-order terms
-  temp_formula <- formula(modelB)
-  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
-
-  for (bool in grepl_array) {
-    if (bool == TRUE) {
-      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
-    }
-  }
-
-
   # Step 2: has_intercept
 
   if ((terms(modelB) %>% attr("intercept")) == 1) {
@@ -391,18 +404,18 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   # Step 3: Pull l1 var names into a variable called l1_vars_B, and vice versa for l2 var names
 
   # i) Pull all variable names from the formula
-  all_vars <- all.vars(formula(modelB))
-  formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
-  cluster_variable <- all_vars[formula_length] # pull cluster, we'll need it later
+  all_variables <- all.vars(formula(modelB))
+  formula_length <- length(all_variables) # this returns the number of elements in the all_variables list
+  cluster_variable <- all_variables[formula_length] # pull cluster, we'll need it later
 
   # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
   # a) Pull all variables except for cluster
 
-  all_vars_except_cluster <- all_vars[1:(length(all_vars) - 1)]
+  outcome_and_predictors <- all_variables[1:(length(all_variables) - 1)]
 
   # b) If any of those variables is non-numeric, then throw an error
 
-  for (var in all_vars_except_cluster) {
+  for (var in outcome_and_predictors) {
 
     if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
@@ -427,7 +440,7 @@ r2mlm_comp_lmer <- function(modelA, modelB) {
   # (c) define variables you'll need
 
   # all variables to sort into L1 and L2
-  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
+  all_vars_except_cluster_and_outcome <- outcome_and_predictors[-1]
 
   # set counters
   l1_counter <- 1
@@ -622,22 +635,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
   # EXTRACT FOR MODEL A
 
-  # Step 0: throw error if model contains higher-order terms
-  temp_formula <- formula(modelA)
-  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
-
-  for (bool in grepl_array) {
-    if (bool == TRUE) {
-      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
-    }
-  }
-
-
-  # Step 1: pull data
-
-  data <- modelA$data
-
-  # Step 2: has_intercept
+  # Step 1) check if modelA has_intercept
 
   if ((terms(modelA) %>% attr("intercept")) == 1) {
     has_intercept = TRUE
@@ -645,26 +643,30 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
     has_intercept = FALSE
   }
 
-  # Step 3: Pull l1 var names into a variable called l1_vars_A, and vice versa for l2 var names
-
-  # i) Pull all variable names from the formula
-  all_vars <- all.vars(formula(modelA))
-
-  # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
-  full_formula <- all.vars(asOneFormula(modelA))
-  cluster_variable <- full_formula[length(full_formula)]
+  # Step 2) Pull all variable names from the formula
+  all_variables <- all.vars(formula(modelA))
+  cluster_variable <- nlme::getGroups(model) %>% attr("") # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)
-  all_vars[length(all_vars) + 1] <- cluster_variable
-  formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
+  all_variables[length(all_variables) + 1] <- cluster_variable
+  formula_length <- length(all_variables) # this returns the number of elements in the all_variables list
+
+  # Step 3a) pull and prepare data
+  # Step 3a) pull and prepare data
+
+  if(is.null(data)) {
+    data = check_hierarchical(modelA, modelB, "nlme", cluster_variable)
+  } else {
+    data = na.omit(data) # if data provided, use that
+  }
 
   # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
 
   # b) If any of those variables is non-numeric, then throw an error
 
-  all_vars_except_cluster <- all.vars(formula(modelA))
+  outcome_and_predictors <- all.vars(formula(modelA))
 
-  for (var in all_vars_except_cluster) {
+  for (var in outcome_and_predictors) {
 
     if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
@@ -681,7 +683,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # (a) Pull your temp dataset to work with
 
   temp_data <- data %>%
-    dplyr::select(tidyselect::all_of(all_vars)) # this pulls a df of all variables and values used in the modelA
+    dplyr::select(tidyselect::all_of(all_variables)) # this pulls a df of all variables and values used in the modelA
 
   # (b) group dataset by clustering variable
   temp_data_grouped <- temp_data %>%
@@ -690,7 +692,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # (c) define variables you'll need
 
   # all variables to sort into L1 and L2
-  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
+  all_vars_except_cluster_and_outcome <- outcome_and_predictors[-1]
 
   # set counters
   l1_counter <- 1
@@ -876,16 +878,6 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
 
   # EXTRACT FOR MODEL B
 
-  # Step 0: throw error if model contains higher-order terms
-  temp_formula <- formula(modelB)
-  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
-
-  for (bool in grepl_array) {
-    if (bool == TRUE) {
-      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
-    }
-  }
-
   # Step 1: determine intercept
 
   if ((terms(modelB) %>% attr("intercept")) == 1) {
@@ -897,23 +889,23 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # Step 3: Pull l1 var names into a variable called l1_vars_B, and vice versa for l2 var names
 
   # i) Pull all variable names from the formula
-  all_vars <- all.vars(formula(modelB))
+  all_variables <- all.vars(formula(modelB))
 
   # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
   full_formula <- all.vars(asOneFormula(modelB))
   cluster_variable <- full_formula[length(full_formula)]
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)
-  all_vars[length(all_vars) + 1] <- cluster_variable
-  formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
+  all_variables[length(all_variables) + 1] <- cluster_variable
+  formula_length <- length(all_variables) # this returns the number of elements in the all_variables list
 
   # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
 
   # b) If any of those variables is non-numeric, then throw an error
 
-  all_vars_except_cluster <- all.vars(formula(modelB))
+  outcome_and_predictors <- all.vars(formula(modelB))
 
-  for (var in all_vars_except_cluster) {
+  for (var in outcome_and_predictors) {
 
     if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
@@ -930,7 +922,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # (a) Pull your temp dataset to work with
 
   temp_data <- data %>%
-    dplyr::select(tidyselect::all_of(all_vars)) # this pulls a df of all variables and values used in the modelB
+    dplyr::select(tidyselect::all_of(all_variables)) # this pulls a df of all variables and values used in the modelB
 
   # (b) group dataset by clustering variable
   temp_data_grouped <- temp_data %>%
@@ -939,7 +931,7 @@ r2mlm_comp_nlme <- function(modelA, modelB) {
   # (c) define variables you'll need
 
   # all variables to sort into L1 and L2
-  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
+  all_vars_except_cluster_and_outcome <- outcome_and_predictors[-1]
 
   # set counters
   l1_counter <- 1

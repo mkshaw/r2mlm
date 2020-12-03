@@ -1,5 +1,40 @@
 #' Helper functions.
 
+#' check_hierarchical: Check if models given to r2mlm_comp are hierarchical.
+#'
+#' @param modelA,modelB Models generated using \code{\link[lme4]{lmer}} or
+#'   \code{\link[nlme]{nlme}}.
+#' @param calling_function Whether the helper funtion is r2mlm_comp_lme4 or
+#'   r2mlm_comp_nlme.
+#' @param cluster_variable Clustering variable in dataframe.
+
+check_hierarchical <- function(modelA, modelB, calling_function, cluster_variable) {
+
+  # step 0: get variables for each model
+  all_vars_A <- all.vars(formula(modelA))
+  all_vars_B <- all.vars(formula(modelB))
+
+  # step 1: assess which model is larger
+
+  if (length(all_vars_A) > length(all_vars_B)) {
+    larger_model <- all_vars_A
+    smaller_model <- all_vars_B
+  } else {
+    larger_model <- all_vars_B
+    smaller_model <- all_vars_A
+  }
+
+  # step 2: check whether smaller model is nested in larger model.
+
+  if (all(smaller_model %in% larger_model)) { # returns true if all variables in smaller model are in larger model
+    data = prepare_data(larger_model, calling_function, cluster_variable)
+    return(data)
+  } else {
+    stop("If your models are not hierarchically nested, you must provide your data: r2mlm_comp(modelA, modelB, data).")
+  }
+
+}
+
 #' get_covs: Return the number in the dataframe associated with a given variable
 #' name.
 #'
