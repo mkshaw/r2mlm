@@ -17,16 +17,22 @@ check_hierarchical <- function(modelA, modelB, calling_function, cluster_variabl
   # step 1: assess which model is larger
 
   if (length(all_vars_A) > length(all_vars_B)) {
-    larger_model <- all_vars_A
-    smaller_model <- all_vars_B
+    larger_model <- modelA
+    larger_model_terms <- all_vars_A
+
+    smaller_model <- modelB
+    smaller_model_terms <- all_vars_B
   } else {
-    larger_model <- all_vars_B
-    smaller_model <- all_vars_A
+    larger_model <- modelB
+    larger_model_terms <- all_vars_B
+
+    smaller_model <- modelA
+    smaller_model_terms <- all_vars_A
   }
 
   # step 2: check whether smaller model is nested in larger model.
 
-  if (all(smaller_model %in% larger_model)) { # returns true if all variables in smaller model are in larger model
+  if (all(smaller_model_terms %in% larger_model_terms)) { # returns true if all variables in smaller model are in larger model
     data = prepare_data(larger_model, calling_function, cluster_variable)
     return(data)
   } else {
