@@ -156,7 +156,14 @@ r2mlm_comp_lmer <- function(modelA, modelB, data) {
   if(is.null(data)) {
     data <- check_hierarchical(modelA, modelB, "lme4", cluster_variable)
   } else {
-    data <- na.omit(data) # if data provided, use that
+    # get interaction variables from both models, create list to add to dataframe
+    interaction_vars <- get_interaction_vars(modelA)
+
+    # get data (when is.null(data), these steps are happening in check_hierarchical -> prepare_data)
+    data <- na.omit(data) %>%
+      add_interaction_vars_to_data(interaction_vars, .) %>%
+      group_data(cluster_variable, .)
+
   }
 
   # Step 3b) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
