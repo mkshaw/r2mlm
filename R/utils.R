@@ -103,7 +103,7 @@ get_random_slope_vars <- function(model, has_intercept, calling_function) {
 #' get_cwc: Determine whether l1_vars are centered within cluster.
 #'
 #' @param l1_vars List of level 1 variables.
-#' @param cluster_variable Clustering variable.
+#' @param cluster_variable Clustering variable in dataframe.
 #' @param data Dataset.
 
 get_cwc <- function(l1_vars, cluster_variable, data) {
@@ -166,7 +166,10 @@ get_interaction_vars <- function(model) {
 #' sort_variables: Sort predictors into level 1 (variance is non-zero) and level
 #' 2 (variance of 0) variables.
 #'
-#' @param
+#' @param data Dataset.
+#' @param predictors List of all predictors in a model, passed by the calling
+#'   function.
+#' @param cluster_variable Clustering variable in dataframe.
 
 sort_variables <- function(data, predictors, cluster_variable) {
 

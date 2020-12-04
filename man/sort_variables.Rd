@@ -7,6 +7,14 @@
 \usage{
 sort_variables(data, predictors, cluster_variable)
 }
+\arguments{
+\item{data}{Dataset.}
+
+\item{predictors}{List of all predictors in a model, passed by the calling
+function.}
+
+\item{cluster_variable}{Clustering variable in dataframe.}
+}
 \description{
 sort_variables: Sort predictors into level 1 (variance is non-zero) and level
 2 (variance of 0) variables.

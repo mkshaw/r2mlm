@@ -9,7 +9,7 @@ get_cwc(l1_vars, cluster_variable, data)
 \arguments{
 \item{l1_vars}{List of level 1 variables.}
 
-\item{cluster_variable}{Clustering variable.}
+\item{cluster_variable}{Clustering variable in dataframe.}
 
 \item{data}{Dataset.}
 }

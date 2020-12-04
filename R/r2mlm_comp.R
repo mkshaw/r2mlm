@@ -164,8 +164,8 @@ r2mlm_comp_lmer <- function(modelA, modelB, data) {
 
     # get data (when is.null(data), these steps are happening in check_hierarchical -> prepare_data)
     data <- na.omit(data) %>%
-      add_interaction_vars_to_data(interaction_vars, .) %>%
-      group_data(cluster_variable, .)
+      add_interaction_vars_to_data(interaction_vars, .data) %>%
+      group_data(cluster_variable, .data)
 
   }
 
@@ -407,8 +407,8 @@ r2mlm_comp_nlme <- function(modelA, modelB, data) {
 
     # get data (when is.null(data), these steps are happening in check_hierarchical -> prepare_data)
     data <- na.omit(data) %>%
-      add_interaction_vars_to_data(interaction_vars, .) %>%
-      group_data(cluster_variable, .)
+      add_interaction_vars_to_data(interaction_vars, .data) %>%
+      group_data(cluster_variable, .data)
 
   }
 
