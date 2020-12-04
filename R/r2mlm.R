@@ -20,7 +20,11 @@
 #' model, and pass that information to \code{\link{r2mlm_manual}}.
 #'
 #' @param model A model generated using \code{\link[lme4]{lmer}} or
-#'   \code{\link[nlme]{nlme}}.
+#'   \code{\link[nlme]{nlme}}. Note that models using \code{lmer} must specify
+#'   random effects at the end of the model, like so: \code{outcome ~ 1 +
+#'   fixed_effects + (random_effects | cluster_variable)}. Anything else (e.g.,
+#'   \code{outcome ~ 1 + (random_effects | cluster_variable) + fixed_effects})
+#'   will not work.
 #'
 #' @return If the input is a valid model, then the output will be a list and
 #'   associated graphical representation of R-squared decompositions. If the

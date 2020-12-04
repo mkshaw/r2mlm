@@ -9,7 +9,11 @@ r2mlm_comp(modelA, modelB, data = NULL)
 }
 \arguments{
 \item{modelA, modelB}{Models generated using \code{\link[lme4]{lmer}} or
-\code{\link[nlme]{nlme}}.}
+\code{\link[nlme]{nlme}}. Note that models using \code{lmer} must specify
+random effects at the end of the model, like so: \code{outcome ~ 1 +
+fixed_effects + (random_effects | cluster_variable)}. Anything else (e.g.,
+\code{outcome ~ 1 + (random_effects | cluster_variable) + fixed_effects})
+will not work.}
 
 \item{data}{Dataset with rows denoting observations and columns denoting
 variables.}
