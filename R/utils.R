@@ -33,7 +33,7 @@ check_hierarchical <- function(modelA, modelB, calling_function, cluster_variabl
   # step 2: check whether smaller model is nested in larger model.
 
   if (all(smaller_model_terms %in% larger_model_terms)) { # returns true if all variables in smaller model are in larger model
-    data = prepare_data(larger_model, calling_function, cluster_variable)
+    data = prepare_data(larger_model, calling_function, cluster_variable, smaller_model)
     return(data)
   } else {
     stop("If your models are not hierarchically nested, you must provide your data: r2mlm_comp(modelA, modelB, data).")

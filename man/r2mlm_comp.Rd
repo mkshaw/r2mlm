@@ -5,11 +5,14 @@
 \title{Compute R-squared differences between two multilevel models, automatically
 inputting parameter estimates.}
 \usage{
-r2mlm_comp(modelA, modelB)
+r2mlm_comp(modelA, modelB, data = NULL)
 }
 \arguments{
 \item{modelA, modelB}{Models generated using \code{\link[lme4]{lmer}} or
 \code{\link[nlme]{nlme}}.}
+
+\item{data}{Dataset with rows denoting observations and columns denoting
+variables.}
 }
 \value{
 If the inputs are valid models, then the output will be a list and

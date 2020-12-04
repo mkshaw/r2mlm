@@ -89,7 +89,7 @@
 #' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME
 #' @importFrom nlme asOneFormula
 #' @importFrom magrittr %>%
-#' @importFrom stats terms formula model.frame
+#' @importFrom stats terms formula model.frame na.omit
 #' @importFrom stringr str_split_fixed
 #' @importFrom rlang := .data
 #'
@@ -157,7 +157,10 @@ r2mlm_comp_lmer <- function(modelA, modelB, data) {
     data <- check_hierarchical(modelA, modelB, "lme4", cluster_variable)
   } else {
     # get interaction variables from both models, create list to add to dataframe
-    interaction_vars <- get_interaction_vars(modelA)
+    interaction_vars_A <- get_interaction_vars(modelA)
+    interaction_vars_B <- get_interaction_vars(modelB)
+
+    interaction_vars <- unique(append(interaction_vars_A, interaction_vars_B)) # merge lists and use unique() to avoid duplicates
 
     # get data (when is.null(data), these steps are happening in check_hierarchical -> prepare_data)
     data <- na.omit(data) %>%
@@ -394,9 +397,19 @@ r2mlm_comp_nlme <- function(modelA, modelB, data) {
   # Step 3a) pull and prepare data
 
   if(is.null(data)) {
-    data = check_hierarchical(modelA, modelB, "nlme", cluster_variable)
+    data <- check_hierarchical(modelA, modelB, "nlme", cluster_variable)
   } else {
-    data = na.omit(data) # if data provided, use that
+    # get interaction variables from both models, create list to add to dataframe
+    interaction_vars_A <- get_interaction_vars(modelA)
+    interaction_vars_B <- get_interaction_vars(modelB)
+
+    interaction_vars <- unique(append(interaction_vars_A, interaction_vars_B)) # merge lists and use unique() to avoid duplicates
+
+    # get data (when is.null(data), these steps are happening in check_hierarchical -> prepare_data)
+    data <- na.omit(data) %>%
+      add_interaction_vars_to_data(interaction_vars, .) %>%
+      group_data(cluster_variable, .)
+
   }
 
   # * Step 3b) determine whether data is appropriate format. Only the cluster variable can be a factor, for now

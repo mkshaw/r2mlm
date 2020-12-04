@@ -5,13 +5,16 @@
 #'
 #' @param model A model generated using \code{\link[lme4]{lmer}} or
 #'   \code{\link[nlme]{nlme}}, passed from the calling function.
+#' @param second_model A model generated using \code{\link[lme4]{lmer}} or
+#'   \code{\link[nlme]{nlme}}, passed from the calling function. Only used
+#'   when r2mlm_comp calls the helper function.
 #' @param calling_function Whether the helper function is r2mlm_lme4 or
 #'   r2mlm_nlme.
 #' @param cluster_variable Clustering variable in dataframe.
 #'
-#' @importFrom broom augment
+#' @importFrom broomExtra augment
 
-prepare_data <- function(model, calling_function, cluster_variable) {
+prepare_data <- function(model, calling_function, cluster_variable, second_model = NULL) {
 
   # Step 1a: pull dataframe associated with model
   data <- broomExtra::augment(model)
@@ -28,6 +31,11 @@ prepare_data <- function(model, calling_function, cluster_variable) {
 
   # * Step 2a) pull interaction terms into list
   interaction_vars <- get_interaction_vars(model)
+
+  if(!is.null(second_model)) {
+    interaction_vars_2 <- get_interaction_vars(second_model)
+    interaction_vars <-  unique(append(interaction_vars, interaction_vars_2))
+  }
 
   # * Step 2b) split interaction terms into halves, multiply halves to create new columns in dataframe
 
