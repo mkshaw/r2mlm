@@ -15,8 +15,8 @@ fixed_effects + (random_effects | cluster_variable)}. Anything else (e.g.,
 \code{outcome ~ 1 + (random_effects | cluster_variable) + fixed_effects})
 will not work.}
 
-\item{data}{Dataset with rows denoting observations and columns denoting
-variables.}
+\item{data}{Optional argument, only needed if models are not hierarchical.
+Dataset with rows denoting observations and columns denoting variables.}
 }
 \value{
 If the inputs are valid models, then the output will be a list and
@@ -67,7 +67,11 @@ modelB_lme4 <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m +
 control_m + s_t_ratio + (1 + salary_c + control_c | schoolID), data =
 teachsat, REML = TRUE, control = lmerControl(optimizer = "bobyqa"))
 
+# Compare models
 r2mlm_comp(modelA_lme4, modelB_lme4)
+
+# Compare models, optional data argument specified
+r2mlm_comp(modelA_lme4, modelB_lme4, teachsat)
 
 # Using nlme for your model
 
@@ -88,7 +92,11 @@ modelB_nlme <- lme(satisfaction ~ 1 + salary_c + control_c + salary_m +
                   method = "REML",
                   control = lmeControl(opt = "optim"))
 
+# Compare models
 r2mlm_comp(modelA_nlme, modelB_nlme)
+
+# Compare models, optional data argument specified
+r2mlm_comp(modelA_nlme, modelB_nlme, teachsat)
 
 }
 \seealso{

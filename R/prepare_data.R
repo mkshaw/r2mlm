@@ -39,17 +39,17 @@ prepare_data <- function(model, calling_function, cluster_variable, second_model
 
   # * Step 2b) split interaction terms into halves, multiply halves to create new columns in dataframe
 
-  data <- add_interaction_vars_to_data(interaction_vars, data)
+  data <- add_interaction_vars_to_data(data, interaction_vars)
 
   # Step 3: group data by cluster variable
 
-  data <- group_data(cluster_variable, data)
+  data <- group_data(data, cluster_variable)
 
   return(data)
 
 }
 
-add_interaction_vars_to_data <- function(interaction_vars, data) {
+add_interaction_vars_to_data <- function(data, interaction_vars) {
 
   for (whole in interaction_vars) {
 
@@ -67,7 +67,7 @@ add_interaction_vars_to_data <- function(interaction_vars, data) {
 
 }
 
-group_data <- function(cluster_variable, data) {
+group_data <- function(data, cluster_variable) {
 
   data <- data %>%
     dplyr::group_by(.data[[cluster_variable]])
