@@ -1,13 +1,3 @@
-#' Helper functions.
-
-#' check_hierarchical: Check if models given to r2mlm_comp are hierarchical.
-#'
-#' @param modelA,modelB Models generated using \code{\link[lme4]{lmer}} or
-#'   \code{\link[nlme]{nlme}}.
-#' @param calling_function Whether the helper funtion is r2mlm_comp_lme4 or
-#'   r2mlm_comp_nlme.
-#' @param cluster_variable Clustering variable in dataframe.
-
 check_hierarchical <- function(modelA, modelB, calling_function, cluster_variable) {
 
   # step 0: get variables for each model
@@ -41,13 +31,6 @@ check_hierarchical <- function(modelA, modelB, calling_function, cluster_variabl
 
 }
 
-#' get_covs: Return the number in the dataframe associated with a given variable
-#' name.
-#'
-#' @param variable_list List of character names of variables.
-#' @param data Dataset containing those variable names.
-#'
-
 get_covs <- function(variable_list, data) {
 
   cov_list <- c() # create empty list to fill
@@ -62,14 +45,6 @@ get_covs <- function(variable_list, data) {
   return(cov_list)
 
 }
-
-#' get_random_slope_vars: Return list of variable names with random effects
-#'
-#' @param model A model generated using \code{\link[lme4]{lmer}} or
-#'   \code{\link[nlme]{nlme}}, passed from the calling function.
-#' @param has_intercept Whether or not the model has an intercept
-#' @param calling_function Whether the helper funtion is r2mlm_lme4 or
-#'   r2mlm_nlme.
 
 get_random_slope_vars <- function(model, has_intercept, calling_function) {
 
@@ -99,12 +74,6 @@ get_random_slope_vars <- function(model, has_intercept, calling_function) {
   return(random_slope_vars)
 
 }
-
-#' get_cwc: Determine whether l1_vars are centered within cluster.
-#'
-#' @param l1_vars List of level 1 variables.
-#' @param cluster_variable Clustering variable in dataframe.
-#' @param data Dataset.
 
 get_cwc <- function(l1_vars, cluster_variable, data) {
 
@@ -141,11 +110,6 @@ get_cwc <- function(l1_vars, cluster_variable, data) {
 
 }
 
-#' get_interaction_vars: Return list of interaction variables
-#'
-#' @param model A model generated using \code{\link[lme4]{lmer}} or
-#'   \code{\link[nlme]{nlme}}, passed from the calling function.
-
 get_interaction_vars <- function(model) {
 
   interaction_vars <- c()
@@ -162,14 +126,6 @@ get_interaction_vars <- function(model) {
   return(interaction_vars)
 
 }
-
-#' sort_variables: Sort predictors into level 1 (variance is non-zero) and level
-#' 2 (variance of 0) variables.
-#'
-#' @param data Dataset.
-#' @param predictors List of all predictors in a model, passed by the calling
-#'   function.
-#' @param cluster_variable Clustering variable in dataframe.
 
 sort_variables <- function(data, predictors, cluster_variable) {
 

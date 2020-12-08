@@ -1,19 +1,3 @@
-#' Pull and prepare data.
-#'
-#' First, pull dataframe associated with model using broom::augment. Then add
-#' interaction terms and other user-created variables to the dataframe.
-#'
-#' @param model A model generated using \code{\link[lme4]{lmer}} or
-#'   \code{\link[nlme]{nlme}}, passed from the calling function.
-#' @param second_model A model generated using \code{\link[lme4]{lmer}} or
-#'   \code{\link[nlme]{nlme}}, passed from the calling function. Only used
-#'   when r2mlm_comp calls the helper function.
-#' @param calling_function Whether the helper function is r2mlm_lme4 or
-#'   r2mlm_nlme.
-#' @param cluster_variable Clustering variable in dataframe.
-#'
-#' @importFrom broomExtra augment
-
 prepare_data <- function(model, calling_function, cluster_variable, second_model = NULL) {
 
   # Step 1a: pull dataframe associated with model
