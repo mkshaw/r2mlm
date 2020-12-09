@@ -1,37 +1,24 @@
-## Resubmission
-
-This is a resubmission. In this version I have:
-
-* Fixed README URLs to be in canonical form
-* Added DOIs to references in the Description field of the DESCRIPTION file
-
 ## Test environments
 * local macOS install, R 3.6.3
-* ubuntu 16.04 (on travis-ci), R 4.0.0
+* ubuntu 16.04 (on travis-ci), R 4.0.2
 * win-builder (devel and release)
 
 ## R CMD check results
 There were no ERRORs or WARNINGs.
 
-There were 3 NOTEs:
+There were 2 NOTEs:
 
-* checking for future file timestamps (710ms)
-   unable to verify current time
-   
-Based on my Google searching, I believe this is an issue with worldclockapi.com.
+* running examples for arch 'i386' ... [30s] NOTE
+Examples with CPU (user + system) or elapsed time > 10s
+            user system elapsed
+r2mlm_comp 12.89   0.08   13.14
 
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Mairead Shaw <mairead.shaw@mail.mcgill.ca>'
+* running examples for arch 'x64' ... [30s] NOTE
+Examples with CPU (user + system) or elapsed time > 10s
+            user system elapsed
+r2mlm_comp 13.42      0   13.58
 
-New submission
-
-This is my first CRAN submission.
-
-* Possibly mis-spelled words in DESCRIPTION:
-  
-    Sterba (12:16, 21:46)
-    
-Sterba is the last name of one of the authors of this package and a paper referenced in the documentation.
+The examples compare results for two models, which is somewhat computationally intensive.
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package.

@@ -20,7 +20,11 @@
 #' model, and pass that information to \code{\link{r2mlm_manual}}.
 #'
 #' @param model A model generated using \code{\link[lme4]{lmer}} or
-#'   \code{\link[nlme]{nlme}}.
+#'   \code{\link[nlme]{nlme}}. Note that models using \code{lmer} must specify
+#'   random effects at the end of the model, like so: \code{outcome ~ 1 +
+#'   fixed_effects + (random_effects | cluster_variable)}. Anything else (e.g.,
+#'   \code{outcome ~ 1 + (random_effects | cluster_variable) + fixed_effects})
+#'   will not work.
 #'
 #' @return If the input is a valid model, then the output will be a list and
 #'   associated graphical representation of R-squared decompositions. If the
@@ -56,7 +60,8 @@
 #'
 #' @family r2mlm single model functions
 #'
-#' @importFrom lme4 fortify.merMod ranef fixef VarCorr getME
+#' @importFrom lme4 ranef fixef VarCorr getME
+#' @importFrom broomExtra augment
 #' @importFrom nlme asOneFormula
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
@@ -70,6 +75,17 @@
 
 r2mlm <- function(model) {
 
+  # throw error if model contains higher-order terms
+  temp_formula <- formula(model)
+  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
+
+  for (bool in grepl_array) {
+    if (bool == TRUE) {
+      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
+    }
+  }
+
+  # call appropriate r2mlm helper function
   if (typeof(model) == "list") {
     r2mlm_nlme(model)
   } else if (typeof(model) == "S4") {
@@ -84,21 +100,7 @@ r2mlm <- function(model) {
 
 r2mlm_lmer <- function(model) {
 
-  # Step 0: throw error if model contains higher-order terms
-  temp_formula <- formula(model)
-  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
-
-  for (bool in grepl_array) {
-    if (bool == TRUE) {
-      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
-    }
-  }
-
-  # Step 1: pull data
-
-  data <- fortify.merMod(model)
-
-  # Step 2: has_intercept
+  # Step 1) check if model has_intercept
 
   if ((terms(model) %>% attr("intercept")) == 1) {
     has_intercept = TRUE
@@ -106,208 +108,83 @@ r2mlm_lmer <- function(model) {
     has_intercept = FALSE
   }
 
-  # Step 3: Pull l1 var names into a variable called l1_vars, and vice versa for l2 var names
+  # Step 2) Pull all variable names from the formula
+  all_variables <- all.vars(formula(model))
+  cluster_variable <- all_variables[length(all_variables)] # pull cluster, we'll need it later
 
-  # i) Pull all variable names from the formula
-  all_vars <- all.vars(formula(model))
-  formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
-  cluster_variable <- all_vars[formula_length] # pull cluster, we'll need it later
+  # Step 3a) pull and prepare data
 
-  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+  data <- prepare_data(model, "lme4", cluster_variable)
+
+  # Step 3b) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
   # a) Pull all variables except for cluster
 
-  all_vars_except_cluster <- all_vars[1:(length(all_vars) - 1)]
+  outcome_and_predictors <- all_variables[1:(length(all_variables) - 1)]
 
   # b) If any of those variables is non-numeric, then throw an error
 
-  for (var in all_vars_except_cluster) {
+  for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 
   }
 
-  # iii) Create vectors to fill
-  l1_vars <- c()
-  l2_vars <- c()
+  # Step 4) Fill l1 and l2 vectors
 
-  # iv) Sort variables into l1_vars and l2_vars
+  # * Step 4a) Define variables you'll be sorting
+  # take the outcome out of the predictors with [2:length(outcome_and_predictors)], then add interaction terms
 
-  # (a) Pull your temp dataset to work with
+  # sometimes the outcome_and_predictors is only an outcome variable (for the null model). If that's the case, then
+  #     predictors is null, just call get_interaction_vars just in case
 
-  temp_data <- model.frame(model) # this pulls a df of all variables and values used in the model
-
-  # (b) group dataset by clustering variable
-  temp_data_grouped <- temp_data %>%
-    dplyr::group_by_at(formula_length) #group by the clustering variable, which is the last variable in the df (by virtue of how formula(model) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
-
-  # (c) define variables you'll need
-
-  # all variables to sort into L1 and L2
-  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
-
-  # set counters
-  l1_counter <- 1
-  l2_counter <- 1
-
-  # (d) loop through all variables in grouped dataset
-
-  for (variable in all_vars_except_cluster_and_outcome) {
-
-    # calculate variance for each cluster
-    t <- temp_data_grouped %>%
-      dplyr::select(tidyselect::all_of(cluster_variable), variable) %>%
-      dplyr::group_map(~ var(.))
-
-    # variable to track variance
-    variance_tracker <- 0
-
-    # add up the variance from each cluster
-    for (i in t) {
-      variance_tracker <- variance_tracker + i
-    }
-
-    # if the sum of variance is 0, then each cluster has 0 variance, so it's an L2 variable
-    if (variance_tracker == 0) {
-      l2_vars[l2_counter] <- variable
-      l2_counter <- l2_counter + 1
-    } else {
-      l1_vars[l1_counter] <- variable
-      l1_counter <- l1_counter + 1
-    }
-
-  }
-
-  # Step 4: pull variable names for L1 predictors with random slopes into a variable called random_slope_vars
-
-  temp_cov_list <- ranef(model)[[1]]
-
-  # determine where to start pulling from the temp_cov_list, depending on whether you need to bypass the `(Intercept)` column
-  if (has_intercept == 1) {
-    running_count <- 2
+  if (length(outcome_and_predictors) == 1) {
+    predictors <- get_interaction_vars(model)
   } else {
-    running_count <- 1
+    predictors <- append(outcome_and_predictors[2:length(outcome_and_predictors)], get_interaction_vars(model))
   }
 
-  random_slope_vars <- c()
-  x <- 1 # counter for indexing in random_slope_vars
+  # * Step 4b) Create and fill vectors
+  l1_vars <- sort_variables(data, predictors, cluster_variable)$l1_vars
+  l2_vars <- sort_variables(data, predictors, cluster_variable)$l2_vars
 
-  # running count less than or equal to list length, so it traverses the entire list (doesn't leave last element off)
-  while (running_count <= length(temp_cov_list)) {
-    random_slope_vars[x] <- names(temp_cov_list[running_count])
-    x <- x + 1
-    running_count <- running_count + 1
-  }
+  # Step 5) pull variable names for L1 predictors with random slopes into a variable called random_slope_vars
 
-  interaction_vars <- c()
-  x <- 1
-  for (term in attr(terms(model), "term.labels")) {
+  random_slope_vars <- get_random_slope_vars(model, has_intercept, "lme4")
 
-    if (grepl(":", term) == TRUE) {
-      interaction_vars[x] <- term
-      x <- x + 1
-    }
-
-  }
-
-  data <- data %>% dplyr::ungroup() # need to ungroup in order to create new columns
-
-  for (whole in interaction_vars) {
-
-    half1 <- str_split_fixed(whole, ":", 2)[1]
-    half2 <- str_split_fixed(whole, ":", 2)[2]
-
-    if (!is.na(match(half1, l2_vars)) && !is.na(match(half2, l2_vars))) {
-      l2_vars[l2_counter] <- whole
-      l2_counter <- l2_counter + 1
-    } else {
-      l1_vars[l1_counter] <- whole
-      l1_counter <- l1_counter + 1
-    }
-
-    newcol <- dplyr::pull(data[half1] * data[half2])
-
-    data <- data %>%
-      dplyr::mutate(!!whole := newcol)
-
-  }
-
-  # Step 5: determine value of centeredwithincluster
-
-  # (a) group data
-
-  data_grouped <- data %>%
-    dplyr::group_by(.data[[cluster_variable]]) # see "Indirection" here for explanation of this group_by formatting: https://dplyr.tidyverse.org/articles/programming.html
+  # Step 6) determine value of centeredwithincluster
 
   if (is.null(l1_vars)) {
     centeredwithincluster <- TRUE
   } else {
-    for (variable in l1_vars) {
-
-      # for each group for the given variable, sum all values
-      t <- data_grouped %>%
-        dplyr::select(cluster_variable, variable) %>%
-        dplyr::group_map(~ sum(.))
-
-      # establish temporary tracker
-      temp_tracker <- 0
-
-      # sum all of the sums
-      for (i in t) {
-        temp_tracker <- temp_tracker + i
-      }
-
-      # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
-      if (temp_tracker < 0.0000001) {
-        centeredwithincluster <- TRUE
-      } else {
-        centeredwithincluster <- FALSE
-        break # break if even one variable is not CWC, because the r2mlm_manual function will need to center everything anyways
-      }
-
-    }
+    centeredwithincluster <- get_cwc(l1_vars, cluster_variable, data)
   }
 
-  # Step 6: pull column numbers for _covs variables
-  # 6a) within_covs (l1 variables)
+  # Step 7) pull column numbers for _covs variables
+  # 7a) within_covs (l1 variables)
   # for (each value in l1_vars list) {match(value, names(data))}
-  within <- c()
-  i = 0
-  for (var in l1_vars) {
-    i = i + 1
-    tmp <- match(var, names(data))
-    within[i] <- tmp
-  }
 
-  # 6b) pull column numbers for between_covs (l2 variables)
-  between <- c()
-  i = 1
-  for (var in l2_vars) {
-    tmp <- match(var, names(data))
-    between[i] <- tmp
-    i = i + 1
-  }
+  within <- get_covs(l1_vars, data)
 
-  # 6c) pull column numbers for random_covs (l1 variables with random slopes)
-  random <- c()
-  i = 1
-  for (var in random_slope_vars) {
-    tmp <- match(var, names(data))
-    random[i] <- tmp
-    i = i + 1
-  }
+  # 7b) pull column numbers for between_covs (l2 variables)
 
-  # Step 7: pull gamma values (fixed slopes)
-  # 7a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
+  between <- get_covs(l2_vars, data)
+
+  # 7c) pull column numbers for random_covs (l1 variables with random slopes)
+
+  random <- get_covs(random_slope_vars, data)
+
+  # Step 8) pull gamma values (fixed slopes)
+  # 8a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
   gammaw <- c()
   i = 1
-  for (var in l1_vars) {
-    gammaw[i] <- fixef(model)[var]
+  for (variable in l1_vars) {
+    gammaw[i] <- fixef(model)[variable]
     i = i + 1
   }
 
-  # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
+  # 8b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab <- c()
   if (has_intercept == TRUE) {
     gammab[1] <- fixef(model)[1]
@@ -320,16 +197,16 @@ r2mlm_lmer <- function(model) {
     i = i + 1
   }
 
-  # Step 8: Tau matrix, results from VarCorr(model)
+  # Step 9) Tau matrix, results from VarCorr(model)
 
   vcov <- VarCorr(model)
   tau <- as.matrix(Matrix::bdiag(vcov))
 
-  # Step 9: sigma^2 value, Rij
+  # Step 10) sigma^2 value, Rij
 
   sigma2 <- getME(model, "sigma")^2
 
-  # Step 10: input everything into r2MLM
+  # Step 11) input everything into r2MLM
 
   r2mlm_manual(as.data.frame(data), within_covs = within, between_covs = between, random_covs = random, gamma_w = gammaw, gamma_b = gammab, Tau = tau, sigma2 = sigma2, has_intercept = has_intercept, clustermeancentered = centeredwithincluster)
 
@@ -339,21 +216,7 @@ r2mlm_lmer <- function(model) {
 
 r2mlm_nlme <- function(model) {
 
-  # Step 0: throw error if model contains higher-order terms
-  temp_formula <- formula(model)
-  grepl_array <- grepl("I(", temp_formula, fixed = TRUE)
-
-  for (bool in grepl_array) {
-    if (bool == TRUE) {
-      stop("Error: r2mlm does not allow for models fit using the I() function; user must thus manually include any desired transformed predictor variables such as x^2 or x^3 as separate columns in dataset.")
-    }
-  }
-
-  # Step 1: pull data
-
-  data <- model$data
-
-  # Step 2: has_intercept
+  # Step 1) check if model has_intercept
 
   if ((terms(model) %>% attr("intercept")) == 1) {
     has_intercept = TRUE
@@ -361,214 +224,78 @@ r2mlm_nlme <- function(model) {
     has_intercept = FALSE
   }
 
-  # Step 3: Pull l1 var names into a variable called l1_vars, and vice versa for l2 var names
-
-  # i) Pull all variable names from the formula
-  all_vars <- all.vars(formula(model))
-
-  # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
-  full_formula <- all.vars(asOneFormula(model))
-  cluster_variable <- full_formula[length(full_formula)]
+  # Step 2) Pull all variable names from the formula
+  all_variables <- all.vars(formula(model))
+  cluster_variable <- nlme::getGroups(model) %>% attr("label") # in nlme, formula(model) doesn't return grouping var, but we'll need that later on, so let's grab it here
 
   # Then add the grouping var to list of all variables, and calculate formula length (for later use, to iterate)
-  all_vars[length(all_vars) + 1] <- cluster_variable
-  formula_length <- length(all_vars) # this returns the number of elements in the all_vars list
+  all_variables[length(all_variables) + 1] <- cluster_variable
+  formula_length <- length(all_variables) # this returns the number of elements in the all_vars list TODO remove this
 
-  # ii) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
+  # Step 3a) pull and prepare data
+  data <- prepare_data(model, "nlme", cluster_variable)
 
-  # b) If any of those variables is non-numeric, then throw an error
+  # * Step 3b) determine whether data is appropriate format. Only the cluster variable can be a factor, for now
 
-  all_vars_except_cluster <- all.vars(formula(model))
+  outcome_and_predictors <-  all_variables[1:length(all_variables) - 1] # Pull all variables except for cluster
 
-  for (var in all_vars_except_cluster) {
+  for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[var]]) == "integer") && !(class(data[[var]]) == "numeric")) {
+    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 
   }
 
-  # iii) Create vectors to fill
-  l1_vars <- c()
-  l2_vars <- c()
+  # Step 4) Fill l1 and l2 vectors
 
-  # iv) Sort variables into l1_vars and l2_vars
+  # * Step 4a) Define variables you'll be sorting
+  # sometimes the outcome_and_predictors is only an outcome variable (for the null model). If that's the case, then
+  #     predictors is null, just call get_interaction_vars just in case
 
-  # (a) Pull your temp dataset to work with
-
-  temp_data <- data %>%
-    dplyr::select(tidyselect::all_of(all_vars)) # this pulls a df of all variables and values used in the model
-
-  # (b) group dataset by clustering variable
-  temp_data_grouped <- temp_data %>%
-    dplyr::group_by_at(formula_length) #group by the clustering variable, which is the last variable in the df (by virtue of how formula(model) works, where it pulls out the formula, and the last variable is on the other side of the |, i.e., the clustering variable)
-
-  # (c) define variables you'll need
-
-  # all variables to sort into L1 and L2
-  all_vars_except_cluster_and_outcome <- all_vars_except_cluster[-1]
-
-  # set counters
-  l1_counter <- 1
-  l2_counter <- 1
-
-  # (d) loop through all variables in grouped dataset
-
-  for (variable in all_vars_except_cluster_and_outcome) {
-
-    # calculate variance for each cluster
-    t <- temp_data_grouped %>%
-      dplyr::select(tidyselect::all_of(cluster_variable), variable) %>%
-      dplyr::group_map(~ var(.))
-
-    # variable to track variance
-    variance_tracker <- 0
-
-    # add up the variance from each cluster
-    for (i in t) {
-      variance_tracker <- variance_tracker + i
-    }
-
-    # if the sum of variance is 0, then each cluster has 0 variance, so it's an L2 variable
-    if (variance_tracker == 0) {
-      l2_vars[l2_counter] <- variable
-      l2_counter <- l2_counter + 1
-    } else {
-      l1_vars[l1_counter] <- variable
-      l1_counter <- l1_counter + 1
-    }
-
-  }
-
-  # Step 4: pull variable names for L1 predictors with random slopes into a variable called random_slope_vars
-
-  temp_cov_list <- nlme::ranef(model)
-
-  # determine where to start pulling from the temp_cov_list, depending on whether you need to bypass the `(Intercept)` column
-  if (has_intercept == 1) {
-    running_count <- 2
+  if (length(outcome_and_predictors) == 1) {
+    predictors <- get_interaction_vars(model)
   } else {
-    running_count <- 1
+    predictors <- append(outcome_and_predictors[2:length(outcome_and_predictors)], get_interaction_vars(model))
   }
 
-  random_slope_vars <- c()
-  x <- 1 # counter for indexing in random_slope_vars
+  # * Step 4b) Create and fill vectors
+  l1_vars <- sort_variables(data, predictors, cluster_variable)$l1_vars
+  l2_vars <- sort_variables(data, predictors, cluster_variable)$l2_vars
 
-  # running count less than or equal to list length, so it traverses the entire list (doesn't leave last element off)
-  while (running_count <= length(temp_cov_list)) {
-    random_slope_vars[x] <- names(temp_cov_list[running_count])
-    x <- x + 1
-    running_count <- running_count + 1
-  }
+  # Step 5) pull variable names for L1 predictors with random slopes into a variable called random_slope_vars
 
-  interaction_vars <- c()
-  x <- 1
-  for (term in attr(terms(model), "term.labels")) {
+  random_slope_vars <- get_random_slope_vars(model, has_intercept, "nlme")
 
-    if (grepl(":", term) == TRUE) {
-      interaction_vars[x] <- term
-      x <- x + 1
-    }
-
-  }
-
-  data <- data %>% dplyr::ungroup() # need to ungroup in order to create new columns
-
-  for (whole in interaction_vars) {
-
-    half1 <- str_split_fixed(whole, ":", 2)[1]
-    half2 <- str_split_fixed(whole, ":", 2)[2]
-
-    if (!is.na(match(half1, l2_vars)) && !is.na(match(half2, l2_vars))) {
-      l2_vars[l2_counter] <- whole
-      l2_counter <- l2_counter + 1
-    } else {
-      l1_vars[l1_counter] <- whole
-      l1_counter <- l1_counter + 1
-    }
-
-    newcol <- dplyr::pull(data[half1] * data[half2])
-
-    data <- data %>%
-      dplyr::mutate(!!whole := newcol)
-
-  }
-
-  # Step 5: determine value of centeredwithincluster
-
-  # (a) group data
-
-  data_grouped <- data %>%
-    dplyr::group_by(.data[[cluster_variable]]) # annoyingly written, because group_by(!!cluster_variable)) doesn't work
+  # Step 6) determine value of centeredwithincluster
 
   if (is.null(l1_vars)) {
     centeredwithincluster <- TRUE
   } else {
-    for (variable in l1_vars) {
-
-      # for each group for the given variable, sum all values
-      t <- data_grouped %>%
-        dplyr::select(cluster_variable, variable) %>% # select cluster_variable and variable (the former to prevent "Adding missing grouping variables" printout)
-        dplyr::group_map(~ sum(.))
-
-      # establish temporary tracker
-      temp_tracker <- 0
-
-      # sum all of the sums
-      for (i in t) {
-        temp_tracker <- temp_tracker + i
-      }
-
-      # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
-      if (temp_tracker < 0.0000001) {
-        centeredwithincluster <- TRUE
-      } else {
-        centeredwithincluster <- FALSE
-        break # break if even one variable is not CWC, because the r2mlm_manual function will need to center everything anyways
-      }
-
-    }
+    centeredwithincluster <- get_cwc(l1_vars, cluster_variable, data)
   }
 
-  # Step 6: pull column numbers for _covs variables
-  # 6a) within_covs (l1 variables)
+  # Step 7) pull column numbers for _covs variables
+  # 7a) within_covs (l1 variables)
   # for (each value in l1_vars list) {match(value, names(data))}
-  within <- c()
-  i = 0
-  for (var in l1_vars) {
-    i = i + 1
-    tmp <- match(var, names(data))
-    within[i] <- tmp
-  }
+  within <- get_covs(l1_vars, data)
 
-  # 6b) pull column numbers for between_covs (l2 variables)
-  between <- c()
-  i = 1
-  for (var in l2_vars) {
-    tmp <- match(var, names(data))
-    between[i] <- tmp
-    i = i + 1
-  }
+  # 7b) pull column numbers for between_covs (l2 variables)
+  between <- get_covs(l2_vars, data)
 
-  # 6c) pull column numbers for random_covs (l1 variables with random slopes)
-  random <- c()
-  i = 1
-  for (var in random_slope_vars) {
-    tmp <- match(var, names(data))
-    random[i] <- tmp
-    i = i + 1
-  }
+  # 7c) pull column numbers for random_covs (l1 variables with random slopes)
+  random <- get_covs(random_slope_vars, data)
 
-  # Step 7: pull gamma values (fixed slopes)
-  # 7a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
+  # Step 8) pull gamma values (fixed slopes)
+  # 8a) gamma_w, fixed slopes for L1 variables (from l1_vars list)
   gammaw <- c()
   i = 1
-  for (var in l1_vars) {
-    gammaw[i] <- nlme::fixef(model)[var]
+  for (variable in l1_vars) {
+    gammaw[i] <- nlme::fixef(model)[variable]
     i = i + 1
   }
 
-  # 7b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
+  # 8b) gamma_b, intercept value if hasintercept = TRUE, and fixed slopes for L2 variables (from between list)
   gammab <- c()
   if (has_intercept == TRUE) {
     gammab[1] <- nlme::fixef(model)[1]
@@ -576,20 +303,20 @@ r2mlm_nlme <- function(model) {
   } else {
     i = 1
   }
-  for (var in l2_vars) {
-    gammab[i] <- nlme::fixef(model)[var]
+  for (variable in l2_vars) {
+    gammab[i] <- nlme::fixef(model)[variable]
     i = i + 1
   }
 
-  # Step 8: Tau matrix
+  # Step 9) Tau matrix
 
   tau <- nlme::getVarCov(model)
 
-  # Step 9: sigma^2 value, Rij
+  # Step 10) sigma^2 value, Rij
 
   sigma2 <- model$sigma^2
 
-  # Step 10: input everything into r2mlm
+  # Step 11) input everything into r2mlm
 
   r2mlm_manual(as.data.frame(data), within_covs = within, between_covs = between, random_covs = random, gamma_w = gammaw, gamma_b = gammab, Tau = tau, sigma2 = sigma2, has_intercept = has_intercept, clustermeancentered = centeredwithincluster)
 

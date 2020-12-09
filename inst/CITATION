@@ -1,0 +1,21 @@
+bibentry(bibtype = "Unpublished",
+         title = "r2mlm: R-Squared Measures for Multilevel Models",
+         author = c(person(given = "Mairead",
+                           family = "Shaw"),
+                    person(given = "Jason D.",
+                           family = "Rights"),
+                    person(given = "Sonya K.",
+                           family = "Sterba"),
+                    person(given = "Jessica K.",
+                           family = "Flake")),
+         year = "2020",
+         doi = "10.31234/osf.io/xc4sv",
+         url = "https://psyarxiv.com/xc4sv/",
+         note = "in-progress",
+
+         header = "To cite r2mlm in publications use:",
+         textVersion =
+           paste("Shaw, M., Rights, J.D., Sterba, S.K., & Flake, J.K. (2020, October 16).",
+                 "r2mlm: R-Squared Measures for Multilevel Models.",
+                 "doi: 10.31234/osf.io/xc4sv.")
+)
