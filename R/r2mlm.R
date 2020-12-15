@@ -12,7 +12,6 @@
 #' R-squared measures from Rights & Sterba (2019) Table 5, as well as bar chart
 #' decompositions are outputted. Any number of level-1 and/or level-2 predictors
 #' is supported. Any of the level-1 predictors can have random slopes.
-
 #'
 #' \code{r2mlm} first determines whether a given model was generated using
 #' \code{\link[lme4]{lmer}} or \code{\link[nlme]{nlme}}, then passes the model

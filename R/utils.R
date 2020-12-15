@@ -98,7 +98,7 @@ get_cwc <- function(l1_vars, cluster_variable, data) {
     }
 
     # if the biggie sum is essentially zero (not exactly zero, because floating point), then the variable is CWC
-    if (temp_tracker < 0.0000001) {
+    if (abs(temp_tracker) < 0.0000001) {
       centeredwithincluster <- TRUE
     } else {
       centeredwithincluster <- FALSE
