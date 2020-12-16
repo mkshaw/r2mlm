@@ -226,6 +226,12 @@ r2mlm_comp_lmer <- function(modelA, modelB, data) {
     centeredwithincluster <- get_cwc(l1_vars_A, cluster_variable, data)
   }
 
+  # * Step 6b) r2mlm_comp requires that both models be centeredwithincluster. If they aren't, then throw an error.
+
+  if (centeredwithincluster == FALSE) {
+    stop("When using r2mlm_comp() to compare models, both models must have level-1 predictors centered within cluster.")
+  }
+
   # Step 7) pull column numbers for _covs variables
   # 7a) within_covs (l1 variables)
   # for (each value in l1_vars list) {match(value, names(data))}
@@ -332,6 +338,12 @@ r2mlm_comp_lmer <- function(modelA, modelB, data) {
     centeredwithincluster <- TRUE
   } else {
     centeredwithincluster <- get_cwc(l1_vars_B, cluster_variable, data)
+  }
+
+  # * Step 6b) r2mlm_comp requires that both models be centeredwithincluster. If they aren't, then throw an error.
+
+  if (centeredwithincluster == FALSE) {
+    stop("When using r2mlm_comp() to compare models, both models must have level-1 predictors centered within cluster.")
   }
 
   # Step 7) pull column numbers for _covs variables
@@ -464,6 +476,12 @@ r2mlm_comp_nlme <- function(modelA, modelB, data) {
     centeredwithincluster <- get_cwc(l1_vars_A, cluster_variable, data)
   }
 
+  # * Step 6b) r2mlm_comp requires that both models be centeredwithincluster. If they aren't, then throw an error.
+
+  if (centeredwithincluster == FALSE) {
+    stop("When using r2mlm_comp() to compare models, both models must have level-1 predictors centered within cluster.")
+  }
+
   # Step 7) pull column numbers for _covs variables
   # 7a) within_covs (l1 variables)
   # for (each value in l1_vars list) {match(value, names(data))}
@@ -569,6 +587,12 @@ r2mlm_comp_nlme <- function(modelA, modelB, data) {
     centeredwithincluster <- TRUE
   } else {
     centeredwithincluster <- get_cwc(l1_vars_B, cluster_variable, data)
+  }
+
+  # * Step 6b) r2mlm_comp requires that both models be centeredwithincluster. If they aren't, then throw an error.
+
+  if (centeredwithincluster == FALSE) {
+    stop("When using r2mlm_comp() to compare models, both models must have level-1 predictors centered within cluster.")
   }
 
   # Step 7) pull column numbers for _covs variables
