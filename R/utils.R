@@ -150,7 +150,7 @@ sort_variables <- function(data, predictors, cluster_variable) {
     # var returns NA if group only 1 row. Replace with 0
     counter = 1
 
-    while (counter < length(t)) {
+    while (counter <= length(t)) {
 
       if (is.na(t[[counter]])) {
         t[[counter]] <- 0
