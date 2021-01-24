@@ -1,6 +1,6 @@
-## code to prepare `DATASET` dataset goes here
+## code to prepare `teachsat` dataset goes here
 
-usethis::use_data(DATASET, overwrite = TRUE)
+usethis::use_data(teachsat, overwrite = TRUE)
 
 #load things
 library(rockchalk)
@@ -9,73 +9,71 @@ library(lme4)
 library(nlme)
 library(lmerTest)
 library(MASS)
+library(truncnorm)
 
 #fixed component of intercept
-gamma00 <- 20
+gamma00 <- 10
 
-#fixed component of school-mean salary
-gamma01 <- 1.3
+#fixed component of school mean salary
+gamma01 <- .5
 
-#fixed component of school-mean control
-gamma02 <- 4
+#fixed component of school mean control
+gamma02 <- .5
 
-#fixed slope of s_t_ratio
-gamma03 <- -.4
+#fixed component of student-teacher ratio
+gamma03 <- .5
 
 #fixed component of school-mean-centered salary
-gamma10 <- 1.5
+gamma10 <- .3
 
 #fixed component of school-mean-centered control
-gamma20 <- 2.5
+gamma20 <- 4
 
-#variance components
-tau00 <- 20
-tau11 <- 1
-tau22 <- 4
+##random effect (co)variances
+tau00 <- 75
+tau11 <- .2
+tau22 <- 1
 tau01 <- 0
 tau02 <- 0
 tau12 <- 0
 Tau <- matrix(c(tau00,tau01,tau02,
                 tau01,tau11,tau12,
                 tau02,tau12,tau22),3,3)
-sigma2 <- 40
+sigma2 <- 100
 
 #set sample size
 clusters <- 300
 clustersize <- 30
 
-#create dataset
+##make dataset
 teachsat <- as.data.frame(matrix(NA,clusters*clustersize,12))
 colnames(teachsat) <- c("schoolID","teacherID","satisfaction","control_c","salary_c","control_m","salary_m","s_t_ratio","u0j","u1j","u2j","eij")
 
-#ID variables
 teachsat[,"schoolID"] <- rep(seq(clusters),each=clustersize)
 teachsat[,"teacherID"] <- rep(seq(clustersize),clusters)
 
 #generate predictors
-teachsat[,"control_c"] <- rnorm(clusters*clustersize,0,1)
-teachsat[,"control_m"] <- rep(rnorm(clusters,0,1),each=clustersize)
-teachsat[,"salary_c"] <- rnorm(clusters*clustersize,0,2)
-teachsat[,"salary_m"] <- rep(rnorm(clusters,50,2),each=clustersize)
-teachsat[,"s_t_ratio"] <- rep(sample(c(10:30),clusters,replace=T),each=clustersize)
+teachsat[,"control_c"] <- (rtruncnorm(clusters*clustersize,a=-3,b=3,mean=0,sd=3))
+teachsat[,"control_m"] <- (rep(rtruncnorm(clusters,a=3,b=7,mean=5,sd=2),each=clustersize))
+teachsat[,"salary_c"] <- (rtruncnorm(clusters*clustersize,a=-20,b=20,mean=0,sd=10))
+teachsat[,"salary_m"] <- rep((rtruncnorm(clusters,a=50,b=100,70,15)),each=clustersize)
+
+teachsat[,"s_t_ratio"] <- rep(sample(c(1/c(15:50)),clusters,replace=T),each=clustersize)
 
 #generate errors
 teachsat[,"eij"] <- rnorm(clusters*clustersize,0,sqrt(sigma2))
-randomeffects <- MASS::mvrnorm(clusters,c(0,0,0),Tau)
+randomeffects <- mvrnorm(clusters,c(0,0,0),Tau)
 teachsat[,"u0j"] <- rep(randomeffects[,1],each=clustersize)
 teachsat[,"u1j"] <- rep(randomeffects[,2],each=clustersize)
 teachsat[,"u2j"] <- rep(randomeffects[,3],each=clustersize)
 
-#group mean center level-1 predictors
-teachsat<- rockchalk::gmc(teachsat,c("control_c","salary_c"),"schoolID")
+#group-mean-center level-1 vars
+teachsat<-gmc(teachsat,c("control_c","salary_c"),"schoolID")
 teachsat$control_c <-teachsat$control_c_dev
 teachsat$salary_c <-teachsat$salary_c_dev
-teachsat<- subset(teachsat, select = -c(control_c_dev,salary_c_dev,control_c_mn,salary_c_mn))
 
-#grand mean center level-2 predictors
-teachsat$salary_m <- teachsat$salary_m - mean(teachsat$salary_m)
-teachsat$control_m <- teachsat$control_m - mean(teachsat$control_m)
-teachsat$s_t_ratio <- teachsat$s_t_ratio - mean(teachsat$s_t_ratio)
+#remove unnecessary vars
+teachsat<- subset(teachsat, select = -c(control_c_dev,salary_c_dev,control_c_mn,salary_c_mn))
 
 #generate outcome
 for(i in seq(clusters*clustersize)){
@@ -84,6 +82,15 @@ for(i in seq(clusters*clustersize)){
     teachsat[i,"u0j"] + teachsat[i,"u1j"]*teachsat[i,"salary_c"]+ teachsat[i,"u2j"]*teachsat[i,"control_c"]+ teachsat[i,"eij"]
 }
 
-#remove error terms from dataset
-teachsat<- subset(teachsat, select = -c(u0j,u1j,u2j,eij))
+##rescale
+teachsat[,"satisfaction"] <- ((teachsat[,"satisfaction"] -mean(teachsat[,"satisfaction"] ))/sd(teachsat[,"satisfaction"]))*1.5 +6
+
+#make sure satisfcation is bound by 1 and 10
+for(i in seq(nrow(teachsat))){
+  if(teachsat[i,"satisfaction"] > 10) teachsat[i,"satisfaction"]  <- 10
+  if(teachsat[i,"satisfaction"] < 1) teachsat[i,"satisfaction"]  <- 1
+}
+
+#remove unnecessary vars
+teachsat<-teachsat[,-c(9:12)]
 

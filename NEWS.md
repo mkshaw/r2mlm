@@ -5,6 +5,9 @@
 * Fixes an issue where models with non-cwc interaction terms were returning results as though they were centered-within-cluster. r2mlm returns non-cwc results, r2mlm_comp breaks. (Issue #42)
 * Fixed an error thrown if certain groups only have one unit: "Error in if (variance_tracker == 0) { : missing value where TRUE/FALSE needed." Fixed this (#44).
 
+## Minor Edits
+* Changed simulated data
+
 # r2mlm 0.2.0
 
 ## Major Changes

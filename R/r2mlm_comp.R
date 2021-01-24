@@ -44,7 +44,7 @@
 #' # Using lme4 for your model
 #' # The "bobyqa" optimizer is required for these particular models to converge
 #'
-#' # Model A, no "salary" components included
+#'\dontrun{ # Model A, no "salary" components included
 #'
 #' modelA_lme4 <- lmer(satisfaction ~ 1 + control_c + control_m + s_t_ratio + (1
 #' + control_c | schoolID), data = teachsat, REML = TRUE, control =
@@ -86,6 +86,7 @@
 #'
 #' # Compare models, optional data argument specified
 #' r2mlm_comp(modelA_nlme, modelB_nlme, teachsat)
+#'}
 #'
 #' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
 #'   S. K. (2019). Quantifying explained variance in multilevel models: An
