@@ -34,7 +34,7 @@ gamma20 <- 4
 
 ##random effect (co)variances
 tau00 <- 75
-tau11 <- .3
+tau11 <- .5
 tau22 <- 6
 tau01 <- 0
 tau02 <- 0
