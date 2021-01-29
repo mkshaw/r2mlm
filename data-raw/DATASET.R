@@ -11,6 +11,9 @@ library(lmerTest)
 library(MASS)
 library(truncnorm)
 
+#satisfaction <- gamma00 + gamma01*salary_m + gamma02*control_m + gamma03*s_t_ratio +
+#  gamma10*salary_c + gamma20*control_c + u0j + u1j*salary_c + u2j*control_c + eij
+
 #fixed component of intercept
 gamma00 <- 10
 
@@ -24,15 +27,15 @@ gamma02 <- .5
 gamma03 <- .5
 
 #fixed component of school-mean-centered salary
-gamma10 <- .3
+gamma10 <- 1
 
 #fixed component of school-mean-centered control
 gamma20 <- 4
 
 ##random effect (co)variances
 tau00 <- 75
-tau11 <- .2
-tau22 <- 1
+tau11 <- .3
+tau22 <- 6
 tau01 <- 0
 tau02 <- 0
 tau12 <- 0
@@ -58,7 +61,7 @@ teachsat[,"control_m"] <- (rep(rtruncnorm(clusters,a=3,b=7,mean=5,sd=2),each=clu
 teachsat[,"salary_c"] <- (rtruncnorm(clusters*clustersize,a=-20,b=20,mean=0,sd=10))
 teachsat[,"salary_m"] <- rep((rtruncnorm(clusters,a=50,b=100,70,15)),each=clustersize)
 
-teachsat[,"s_t_ratio"] <- rep(sample(c(1/c(15:50)),clusters,replace=T),each=clustersize)
+teachsat[,"s_t_ratio"] <- rep(sample(c(15:50),clusters,replace=T),each=clustersize)
 
 #generate errors
 teachsat[,"eij"] <- rnorm(clusters*clustersize,0,sqrt(sigma2))

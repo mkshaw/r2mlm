@@ -9,12 +9,12 @@ A data frame with 9000 rows and 8 columns:
 \describe{
   \item{schoolID}{school identification number}
   \item{teacherID}{teacher identification number}
-  \item{satisfaction}{numerical rating of teacher job satisfaction}
+  \item{satisfaction}{teacher job satisfaction, 1-10 scale}
   \item{control_c}{school-mean-centered rating of teacher's reported control over curriculum}
   \item{salary_c}{school-mean-centered teacher's salary (in thousands of dollars)}
-  \item{control_m}{grand-mean-centered school-mean rating of teacher's reported control over curriculum}
-  \item{salary_m}{grand-mean-centered school-mean teacher's salary (in thousands of dollars)}
-  \item{s_t_ratio}{grand-mean-centered student to teacher ratio for the school (total number of students/ total number of teachers)}
+  \item{control_m}{school mean rating of teacher's reported control over curriculum}
+  \item{salary_m}{school mean teacher's salary (in thousands of dollars)}
+  \item{s_t_ratio}{student to teacher ratio for the school (number of students per teacher)}
 }
 }
 \usage{
