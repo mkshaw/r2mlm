@@ -24,7 +24,7 @@ gamma01 <- .5
 gamma02 <- .5
 
 #fixed component of student-teacher ratio
-gamma03 <- .5
+gamma03 <- -.5
 
 #fixed component of school-mean-centered salary
 gamma10 <- 1
