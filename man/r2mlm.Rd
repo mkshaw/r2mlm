@@ -5,7 +5,7 @@
 \title{Compute R-squared values for multilevel models, automatically inputting
 parameter estimates.}
 \usage{
-r2mlm(model)
+r2mlm(model, bargraph = TRUE)
 }
 \arguments{
 \item{model}{A model generated using \code{\link[lme4]{lmer}} or
@@ -14,6 +14,8 @@ random effects at the end of the model, like so: \code{outcome ~ 1 +
 fixed_effects + (random_effects | cluster_variable)}. Anything else (e.g.,
 \code{outcome ~ 1 + (random_effects | cluster_variable) + fixed_effects})
 will not work.}
+
+\item{bargraph}{Optional bar graph output, default is TRUE.}
 }
 \value{
 If the input is a valid model, then the output will be a list and

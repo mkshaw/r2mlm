@@ -15,7 +15,8 @@ r2mlm_manual(
   Tau,
   sigma2,
   has_intercept = TRUE,
-  clustermeancentered = TRUE
+  clustermeancentered = TRUE,
+  bargraph = TRUE
 )
 }
 \arguments{
@@ -61,6 +62,8 @@ by the within_covs list) are assumed to be cluster-mean-centered and
 function will output all decompositions; if set to FALSE, function will
 output only total decompositions (see Description above); set to TRUE by
 default.}
+
+\item{bargraph}{Optional bar graph output, default is TRUE.}
 }
 \value{
 If the input is valid, then the output will be a list and associated

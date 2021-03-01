@@ -46,6 +46,7 @@
 #'   function will output all decompositions; if set to FALSE, function will
 #'   output only total decompositions (see Description above); set to TRUE by
 #'   default.
+#' @param bargraph Optional bar graph output, default is TRUE.
 #'
 #' @return If the input is valid, then the output will be a list and associated
 #'   graphical representation of R-squared decompositions. If the input is not
@@ -78,7 +79,7 @@
 #' @export
 
 r2mlm_manual <- function(data, within_covs, between_covs, random_covs,
-                  gamma_w, gamma_b, Tau, sigma2, has_intercept = TRUE, clustermeancentered = TRUE){
+                  gamma_w, gamma_b, Tau, sigma2, has_intercept = TRUE, clustermeancentered = TRUE, bargraph = TRUE){
   if(has_intercept == T){
     if(length(gamma_b)>1) gamma <- c(1, gamma_w, gamma_b[2:length(gamma_b)])
     if(length(gamma_b) == 1) gamma <- c(1, gamma_w)
@@ -171,7 +172,7 @@ r2mlm_manual <- function(data, within_covs, between_covs, random_covs,
     colnames(R2_table) <- c("total", "within", "between")
   }
   ##bar chart
-  if(clustermeancentered == TRUE){
+  if(clustermeancentered == TRUE && bargraph == TRUE){
     contributions_stacked <- matrix(c(decomp_fixed_within, decomp_fixed_between, decomp_varslopes, decomp_varmeans, decomp_sigma,
                                       decomp_fixed_within_w, 0, decomp_varslopes_w, 0, decomp_sigma_w,
                                       0, decomp_fixed_between_b, 0, decomp_varmeans_b, 0), 5, 3)
@@ -194,18 +195,23 @@ r2mlm_manual <- function(data, within_covs, between_covs, random_covs,
     R2_table <- matrix(c(R2_f, R2_v, R2_m, R2_fv, R2_fvm), ncol = 1)
     rownames(R2_table) <- c("f", "v", "m", "fv", "fvm")
     colnames(R2_table) <- c("total")
-    ##barchar
-    contributions_stacked <- matrix(c(decomp_fixed_notdecomp, decomp_varslopes_notdecomp, decomp_varmeans_notdecomp, decomp_sigma_notdecomp), 4, 1)
-    colnames(contributions_stacked) <- c("total")
-    rownames(contributions_stacked) <- c("fixed slopes",
-                                         "slope variation",
-                                         "intercept variation",
-                                         "residual")
-    barplot(contributions_stacked, main="Decomposition", horiz=FALSE,
-            ylim=c(0, 1), col=c("darkblue", "darkblue", "darkblue", "white"), ylab="proportion of variance",
-            density=c(NA, 30, 40, NA), angle=c(0, 0, 135, 0), xlim=c(0, 1), width=c(.6))
-    legend(.30, -.1, legend=rownames(contributions_stacked), fill=c("darkblue", "darkblue", "darkblue", "white"),
-           cex=.7,  pt.cex = 1, xpd=TRUE, density=c(NA, 30, 40, NA), angle=c(0, 0, 135, 0))
+
+    ##barchart
+
+    if (bargraph == TRUE) {
+      contributions_stacked <- matrix(c(decomp_fixed_notdecomp, decomp_varslopes_notdecomp, decomp_varmeans_notdecomp, decomp_sigma_notdecomp), 4, 1)
+      colnames(contributions_stacked) <- c("total")
+      rownames(contributions_stacked) <- c("fixed slopes",
+                                           "slope variation",
+                                           "intercept variation",
+                                           "residual")
+      barplot(contributions_stacked, main="Decomposition", horiz=FALSE,
+              ylim=c(0, 1), col=c("darkblue", "darkblue", "darkblue", "white"), ylab="proportion of variance",
+              density=c(NA, 30, 40, NA), angle=c(0, 0, 135, 0), xlim=c(0, 1), width=c(.6))
+      legend(.30, -.1, legend=rownames(contributions_stacked), fill=c("darkblue", "darkblue", "darkblue", "white"),
+             cex=.7,  pt.cex = 1, xpd=TRUE, density=c(NA, 30, 40, NA), angle=c(0, 0, 135, 0))
+    }
+
   }
   Output <- list(noquote(decomp_table), noquote(R2_table))
   names(Output) <- c("Decompositions", "R2s")

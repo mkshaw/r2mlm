@@ -49,6 +49,7 @@
 #'   slope’s variance and covariances (to be entered in the order listed by
 #'   random_covs).
 #' @param sigma2_modA,sigma2_modB Level-1 residual variance.
+#' @param bargraph Optional bar graph output, default is TRUE.
 #'
 #' @return If the inputs are valid models, then the output will be a list and
 #'   associated graphical representation of R-squared decompositions.
@@ -95,7 +96,7 @@
 r2mlm_comp_manual <- function(data,within_covs_modA,between_covs_modA,random_covs_modA,
                       gamma_w_modA,gamma_b_modA,Tau_modA,sigma2_modA,
                       within_covs_modB,between_covs_modB,random_covs_modB,
-                      gamma_w_modB,gamma_b_modB,Tau_modB,sigma2_modB){
+                      gamma_w_modB,gamma_b_modB,Tau_modB,sigma2_modB, bargraph = TRUE){
   ##r2MLM function
   r2MLM <- function(data,within_covs,between_covs,random_covs,
                     gamma_w,gamma_b,Tau,sigma2,modelname){
@@ -168,20 +169,24 @@ r2mlm_comp_manual <- function(data,within_covs_modA,between_covs_modA,random_cov
     rownames(R2_table) <- c("f1","f2","v","m","f","fv","fvm")
     colnames(R2_table) <- c("total","within","between")
     ##barchart
-    contributions_stacked <- matrix(c(decomp_fixed_within,decomp_fixed_between,decomp_varslopes,decomp_varmeans,decomp_sigma,
-                                      decomp_fixed_within_w,0,decomp_varslopes_w,0,decomp_sigma_w,
-                                      0,decomp_fixed_between_b,0,decomp_varmeans_b,0),5,3)
-    colnames(contributions_stacked) <- c("total","within","between")
-    rownames(contributions_stacked) <- c("fixed slopes (within)",
-                                         "fixed slopes (between)",
-                                         "slope variation (within)",
-                                         "intercept variation (between)",
-                                         "residual (within)")
-    barplot(contributions_stacked, main=paste0("Decomposition of Scaled Variance, Model ",modelname), horiz=FALSE,
-            ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
-            density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),xlim=c(0,1),width=c(.3,.3))
-    legend(.33,-.1,legend=rownames(contributions_stacked),fill=c("darkred","steelblue","darkred","midnightblue","white"),
-           cex=.7, pt.cex = 1,xpd=TRUE,density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0))
+
+    if (bargraph == TRUE) {
+      contributions_stacked <- matrix(c(decomp_fixed_within,decomp_fixed_between,decomp_varslopes,decomp_varmeans,decomp_sigma,
+                                        decomp_fixed_within_w,0,decomp_varslopes_w,0,decomp_sigma_w,
+                                        0,decomp_fixed_between_b,0,decomp_varmeans_b,0),5,3)
+      colnames(contributions_stacked) <- c("total","within","between")
+      rownames(contributions_stacked) <- c("fixed slopes (within)",
+                                           "fixed slopes (between)",
+                                           "slope variation (within)",
+                                           "intercept variation (between)",
+                                           "residual (within)")
+      barplot(contributions_stacked, main=paste0("Decomposition of Scaled Variance, Model ",modelname), horiz=FALSE,
+              ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
+              density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),xlim=c(0,1),width=c(.3,.3))
+      legend(.33,-.1,legend=rownames(contributions_stacked),fill=c("darkred","steelblue","darkred","midnightblue","white"),
+             cex=.7, pt.cex = 1,xpd=TRUE,density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0))
+    }
+
     Output <- list(noquote(decomp_table),noquote(R2_table))
     names(Output) <- c("Decompositions","R2s")
     return(Output)
@@ -206,37 +211,41 @@ r2mlm_comp_manual <- function(data,within_covs_modA,between_covs_modA,random_cov
   delta_fv_t <- delta_f1_t + delta_f2_t + delta_v_t
   delta_fvm_t <- delta_f1_t + delta_f2_t + delta_v_t + delta_m_t
   delta_f1v_w <- delta_f1_w + delta_v_w
-  ##comparison bar charts
-  contributions_stacked_total <-  matrix(c(as.numeric(decomp_modA[1,1]),as.numeric(decomp_modA[2,1]),as.numeric(decomp_modA[3,1]),as.numeric(decomp_modA[4,1]),as.numeric(decomp_modA[5,1]),              as.numeric(decomp_modB[1,1]),as.numeric(decomp_modB[2,1]),as.numeric(decomp_modB[3,1]),as.numeric(decomp_modB[4,1]),as.numeric(decomp_modB[5,1])),5,2)
-  colnames(contributions_stacked_total) <- c("Model A","Model B")
-  barplot(contributions_stacked_total, main="Decomposition of Scaled Total Variance", horiz=FALSE,
-          ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
-          density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),width=c(.3,.3))
-  legend(0.26,-.1,legend=c("fixed slopes (within)",
-                           "fixed slopes (between)",
-                           "slope variation (within)",
-                           "intercept variation (between)",
-                           "residual (within)"),fill=c("darkred","steelblue","darkred","midnightblue","white"),
-         cex=.7, pt.cex = 1,xpd=TRUE,density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0))
-  contributions_stacked_within <-  matrix(c(as.numeric(decomp_modA[1,2]),0,as.numeric(decomp_modA[3,2]),0,as.numeric(decomp_modA[5,2]),
-                                            as.numeric(decomp_modB[1,2]),0,as.numeric(decomp_modB[3,2]),0,as.numeric(decomp_modB[5,2])),5,2)
-  colnames(contributions_stacked_within) <- c("Model A","Model B")
-  barplot(contributions_stacked_within, main="Decomposition of Scaled Within-Cluster Variance", horiz=FALSE,
-          ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
-          density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),width=c(.3,.3))
-  legend(0.28,-.1,legend=c("fixed slopes (within)",
-                           "slope variation (within)",
-                           "residual (within)"),fill=c("darkred","darkred","white"),
-         cex=.7, pt.cex = 1,xpd=TRUE,density=c(NA,30,NA),angle=c(0,0,0))
-  contributions_stacked_between <-  matrix(c(0,as.numeric(decomp_modA[2,3]),0,as.numeric(decomp_modA[4,3]),0,
-                                             0,as.numeric(decomp_modB[2,3]),0,as.numeric(decomp_modB[4,3]),0),5,2)
-  colnames(contributions_stacked_between) <- c("Model A","Model B")
-  barplot(contributions_stacked_between, main="Decomposition of Scaled Between-Cluster Variance", horiz=FALSE,
-          ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
-          density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),width=c(.3,.3))
-  legend(0.26,-.1,legend=c("fixed slopes (between)",
-                           "intercept variation (between)"),fill=c("steelblue","midnightblue"),
-         cex=.7, pt.cex = 1,xpd=TRUE,density=c(NA,40),angle=c(45,135))
+
+  if (bargraph == TRUE) {
+    ##comparison bar charts
+    contributions_stacked_total <-  matrix(c(as.numeric(decomp_modA[1,1]),as.numeric(decomp_modA[2,1]),as.numeric(decomp_modA[3,1]),as.numeric(decomp_modA[4,1]),as.numeric(decomp_modA[5,1]),              as.numeric(decomp_modB[1,1]),as.numeric(decomp_modB[2,1]),as.numeric(decomp_modB[3,1]),as.numeric(decomp_modB[4,1]),as.numeric(decomp_modB[5,1])),5,2)
+    colnames(contributions_stacked_total) <- c("Model A","Model B")
+    barplot(contributions_stacked_total, main="Decomposition of Scaled Total Variance", horiz=FALSE,
+            ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
+            density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),width=c(.3,.3))
+    legend(0.26,-.1,legend=c("fixed slopes (within)",
+                             "fixed slopes (between)",
+                             "slope variation (within)",
+                             "intercept variation (between)",
+                             "residual (within)"),fill=c("darkred","steelblue","darkred","midnightblue","white"),
+           cex=.7, pt.cex = 1,xpd=TRUE,density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0))
+    contributions_stacked_within <-  matrix(c(as.numeric(decomp_modA[1,2]),0,as.numeric(decomp_modA[3,2]),0,as.numeric(decomp_modA[5,2]),
+                                              as.numeric(decomp_modB[1,2]),0,as.numeric(decomp_modB[3,2]),0,as.numeric(decomp_modB[5,2])),5,2)
+    colnames(contributions_stacked_within) <- c("Model A","Model B")
+    barplot(contributions_stacked_within, main="Decomposition of Scaled Within-Cluster Variance", horiz=FALSE,
+            ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
+            density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),width=c(.3,.3))
+    legend(0.28,-.1,legend=c("fixed slopes (within)",
+                             "slope variation (within)",
+                             "residual (within)"),fill=c("darkred","darkred","white"),
+           cex=.7, pt.cex = 1,xpd=TRUE,density=c(NA,30,NA),angle=c(0,0,0))
+    contributions_stacked_between <-  matrix(c(0,as.numeric(decomp_modA[2,3]),0,as.numeric(decomp_modA[4,3]),0,
+                                               0,as.numeric(decomp_modB[2,3]),0,as.numeric(decomp_modB[4,3]),0),5,2)
+    colnames(contributions_stacked_between) <- c("Model A","Model B")
+    barplot(contributions_stacked_between, main="Decomposition of Scaled Between-Cluster Variance", horiz=FALSE,
+            ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
+            density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),width=c(.3,.3))
+    legend(0.26,-.1,legend=c("fixed slopes (between)",
+                             "intercept variation (between)"),fill=c("steelblue","midnightblue"),
+           cex=.7, pt.cex = 1,xpd=TRUE,density=c(NA,40),angle=c(45,135))
+  }
+
   ##table of R2 deltas
   R2_modA <- results_modA$R2s
   R2_modB <- results_modB$R2s

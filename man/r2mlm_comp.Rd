@@ -5,7 +5,7 @@
 \title{Compute R-squared differences between two multilevel models, automatically
 inputting parameter estimates.}
 \usage{
-r2mlm_comp(modelA, modelB, data = NULL)
+r2mlm_comp(modelA, modelB, data = NULL, bargraph = TRUE)
 }
 \arguments{
 \item{modelA, modelB}{Models generated using \code{\link[lme4]{lmer}} or
@@ -17,6 +17,8 @@ will not work.}
 
 \item{data}{Optional argument, only needed if models are not hierarchical.
 Dataset with rows denoting observations and columns denoting variables.}
+
+\item{bargraph}{Optional bar graph output, default is TRUE.}
 }
 \value{
 If the inputs are valid models, then the output will be a list and
