@@ -34,6 +34,7 @@
 #'   will not work.
 #' @param data Optional argument, only needed if models are not hierarchical.
 #'   Dataset with rows denoting observations and columns denoting variables.
+#' @param bargraph Optional bar graph output, default is TRUE.
 #'
 #' @return If the inputs are valid models, then the output will be a list and
 #'   associated graphical representation of R-squared decompositions. If the
@@ -110,7 +111,7 @@
 
 # 1 r2mlm_comp_wrapper -----------------------------------------------------
 
-r2mlm_comp <- function(modelA, modelB, data = NULL) {
+r2mlm_comp <- function(modelA, modelB, data = NULL, bargraph = TRUE) {
 
   # throw error if model contains higher-order terms
   temp_formula <- formula(modelA)
@@ -137,9 +138,9 @@ r2mlm_comp <- function(modelA, modelB, data = NULL) {
   }
 
   if (typeof(modelA) == "list") {
-    r2mlm_comp_nlme(modelA, modelB, data)
+    r2mlm_comp_nlme(modelA, modelB, data, bargraph)
   } else if (typeof(modelA) == "S4") {
-    r2mlm_comp_lmer(modelA, modelB, data)
+    r2mlm_comp_lmer(modelA, modelB, data, bargraph)
   } else {
     stop("Error. You must input models generated using either the lme4 or nlme package.")
   }
@@ -148,7 +149,7 @@ r2mlm_comp <- function(modelA, modelB, data = NULL) {
 
 # 2 r2mlm_comp_lmer --------------------------------------------------------
 
-r2mlm_comp_lmer <- function(modelA, modelB, data) {
+r2mlm_comp_lmer <- function(modelA, modelB, data, bargraph) {
 
   # r2mlm_ wrapper sub-functions, but for modelA
 
@@ -393,13 +394,13 @@ r2mlm_comp_lmer <- function(modelA, modelB, data) {
   sigma2_B <- lme4::getME(modelB, "sigma")^2
 
 
-  r2mlm_comp_manual(as.data.frame(data), within_covs_modA = within_A, between_covs_modA = between_A, random_covs_modA = random_A, gamma_w_modA = gammaw_A, gamma_b_modA = gammab_A, Tau_modA = tau_A, sigma2_modA = sigma2_A, within_covs_modB = within_B, between_covs_modB = between_B, random_covs_modB = random_B, gamma_w_modB = gammaw_B, gamma_b_modB = gammab_B, Tau_modB = tau_B, sigma2_modB = sigma2_B)
+  r2mlm_comp_manual(as.data.frame(data), within_covs_modA = within_A, between_covs_modA = between_A, random_covs_modA = random_A, gamma_w_modA = gammaw_A, gamma_b_modA = gammab_A, Tau_modA = tau_A, sigma2_modA = sigma2_A, within_covs_modB = within_B, between_covs_modB = between_B, random_covs_modB = random_B, gamma_w_modB = gammaw_B, gamma_b_modB = gammab_B, Tau_modB = tau_B, sigma2_modB = sigma2_B, bargraph = bargraph)
 
 }
 
 # 3 r2mlm_comp_nlme --------------------------------------------------------
 
-r2mlm_comp_nlme <- function(modelA, modelB, data) {
+r2mlm_comp_nlme <- function(modelA, modelB, data, bargraph) {
 
   # EXTRACT FOR MODEL A
 
@@ -644,6 +645,6 @@ r2mlm_comp_nlme <- function(modelA, modelB, data) {
 
   # Step 11) input everything into r2mlm_comp_manual
 
-  r2mlm_comp_manual(as.data.frame(data), within_covs_modA = within_A, between_covs_modA = between_A, random_covs_modA = random_A, gamma_w_modA = gammaw_A, gamma_b_modA = gammab_A, Tau_modA = tau_A, sigma2_modA = sigma2_A, within_covs_modB = within_B, between_covs_modB = between_B, random_covs_modB = random_B, gamma_w_modB = gammaw_B, gamma_b_modB = gammab_B, Tau_modB = tau_B, sigma2_modB = sigma2_B)
+  r2mlm_comp_manual(as.data.frame(data), within_covs_modA = within_A, between_covs_modA = between_A, random_covs_modA = random_A, gamma_w_modA = gammaw_A, gamma_b_modA = gammab_A, Tau_modA = tau_A, sigma2_modA = sigma2_A, within_covs_modB = within_B, between_covs_modB = between_B, random_covs_modB = random_B, gamma_w_modB = gammaw_B, gamma_b_modB = gammab_B, Tau_modB = tau_B, sigma2_modB = sigma2_B, bargraph = bargraph)
 
 }

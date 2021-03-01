@@ -20,7 +20,8 @@ r2mlm_comp_manual(
   gamma_w_modB,
   gamma_b_modB,
   Tau_modB,
-  sigma2_modB
+  sigma2_modB,
+  bargraph = TRUE
 )
 }
 \arguments{
@@ -56,6 +57,8 @@ slope’s variance and covariances (to be entered in the order listed by
 random_covs).}
 
 \item{sigma2_modA, sigma2_modB}{Level-1 residual variance.}
+
+\item{bargraph}{Optional bar graph output, default is TRUE.}
 }
 \value{
 If the inputs are valid models, then the output will be a list and
