@@ -1,5 +1,8 @@
 # r2mlm 0.2.1
 
+## Major Changes
+* Bar graph output is now optional. The default behaviour is to output bar graphs, but if you don't want graphical output, the argument is `bargraph = FALSE`. For example, `r2mlm(model, bargraph = FALSE)`. (Issue #46)
+
 ## Bug Fixes
 * To test whether clusters are mean-centered, the code computes cluster means for all level-1 variables, sees if the means are roughly zero (< .0000001), and if yes then it assigns `clustermeancentered = TRUE`. This update changes the code to test whether the *absolute value* of the means are roughly zero, to address the case in which a cluster has a negative non-zero mean (that would otherwise mistakenly be assigned to `clustermeancentered = TRUE` because the negative number is less than 0.0000001). (Issue #41)
 * Fixes an issue where models with non-cwc interaction terms were returning results as though they were centered-within-cluster. r2mlm returns non-cwc results, r2mlm_comp breaks. (Issue #42)
