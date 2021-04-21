@@ -1,14 +1,10 @@
 prepare_data <- function(model, calling_function, cluster_variable, second_model = NULL) {
 
   # Step 1a: pull dataframe associated with model
-  data <- broomExtra::augment(model)
-
-  # Step 1b: remove the dot variables (.fitted, .resid, .fixed, etc.) from data.
-  # lme4 returns way more dot variables
-  if (calling_function == "nlme") {
-    data <- data[1:(length(data) - 3)]
-  } else if (calling_function == "lme4") {
-    data <- data[1:(length(data) - 11)]
+  if (calling_function == "lme4") {
+    data <- model@frame
+  } else {
+    data <- model[["data"]]
   }
 
   # Step 2: add interaction terms to the dataframe
