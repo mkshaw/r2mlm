@@ -180,7 +180,7 @@ r2mlm_comp_manual <- function(data,within_covs_modA,between_covs_modA,random_cov
                                            "slope variation (within)",
                                            "intercept variation (between)",
                                            "residual (within)")
-      barplot(contributions_stacked, main=paste0("Decomposition of Scaled Variance, Model ",modelname), horiz=FALSE,
+      barplot(contributions_stacked, main=paste0("Decomposition, Model ",modelname), horiz=FALSE,
               ylim=c(0,1),col=c("darkred","steelblue","darkred","midnightblue","white"),ylab="proportion of variance",
               density=c(NA,NA,30,40,NA),angle=c(0,45,0,135,0),xlim=c(0,1),width=c(.3,.3))
       legend(.33,-.1,legend=rownames(contributions_stacked),fill=c("darkred","steelblue","darkred","midnightblue","white"),
