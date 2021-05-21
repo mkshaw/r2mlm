@@ -72,6 +72,7 @@ r2mlm(model_nlme)
   Methods, 24(3), 309–338.}
 
 Other r2mlm single model functions: 
+\code{\link{r2mlm3_manual}()},
 \code{\link{r2mlm_manual}()}
 }
 \concept{r2mlm single model functions}
