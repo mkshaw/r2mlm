@@ -1,6 +1,7 @@
-# r2mlm 0.2.1
+# r2mlm 0.3.0
 
 ## Major Changes
+* Adds two manual functions: one for 3-level models (r2mlm3_manual) and one for models with heteroscedasticity, autocorrelation, nonlinearity, and non-centered-within-cluster models (r2mlm_long_manual)
 * Bar graph output is now optional. The default behaviour is to output bar graphs, but if you don't want graphical output, the argument is `bargraph = FALSE`. For example, `r2mlm(model, bargraph = FALSE)`. (Issue #46)
 
 ## Bug Fixes

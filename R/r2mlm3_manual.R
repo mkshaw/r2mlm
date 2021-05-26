@@ -110,7 +110,8 @@ r2mlm3_manual <-
   function(data, l1_covs, l2_covs, l3_covs, random_covs12, random_covs13,
            random_covs23, gamma_1, gamma_2, gamma_3, Tau12, Tau13, Tau23,
            sigma2, clustermeancentered = TRUE, Tau2_noncmc = NULL,
-           Tau3_noncmc = NULL, l2clusterID_noncmc = NULL, l3clusterID_noncmc = NULL) {
+           Tau3_noncmc = NULL, l2clusterID_noncmc = NULL, l3clusterID_noncmc = NULL,
+           bargraph = TRUE) {
 
     if (clustermeancentered == TRUE) {
       ##compute phis
@@ -244,70 +245,71 @@ r2mlm3_manual <-
       colnames(R2_table) <- c("total", "l1", "l2", "l3")
 
       ##barchart
+      if (bagraph == TRUE) {
+        contributions_stacked <-
+          matrix(
+            c(R2_f1_t, R2_f2_t, R2_f3_t, R2_v12_t,
+              R2_v13_t, R2_v23_t, R2_m2_t, R2_m3_t,
+              sigma2 / totalvar, R2_f1_1, 0, 0,
+              R2_v12_1, R2_v13_1, 0, 0,
+              0, sigma2 / l1var, 0, R2_f2_2,
+              0, 0, 0, R2_v23_2,
+              R2_m2_2, 0, 0, 0,
+              0, R2_f3_3, 0, 0,
+              0, 0, R2_m3_3, 0
+            ),
+            nrow = 9,
+            ncol = 4
+          )
+        colnames(contributions_stacked) <-
+          c("total", "level-1", "level-2", "level-3")
+        rownames(contributions_stacked) <- c("f1", "f2", "f3",
+                                             "v12", "v13", "v23",
+                                             "m2", "m3", "resid")
 
-      contributions_stacked <-
-        matrix(
-          c(R2_f1_t, R2_f2_t, R2_f3_t, R2_v12_t,
-            R2_v13_t, R2_v23_t, R2_m2_t, R2_m3_t,
-            sigma2 / totalvar, R2_f1_1, 0, 0,
-            R2_v12_1, R2_v13_1, 0, 0,
-            0, sigma2 / l1var, 0, R2_f2_2,
-            0, 0, 0, R2_v23_2,
-            R2_m2_2, 0, 0, 0,
-            0, R2_f3_3, 0, 0,
-            0, 0, R2_m3_3, 0
+        barplot(
+          contributions_stacked,
+          main = "Decomposition",
+          horiz = FALSE,
+          ylim = c(0, 1),
+          col = c(
+            "darkred",
+            "steelblue",
+            "darkgoldenrod1",
+            "darkred",
+            "darkred",
+            "midnightblue",
+            "midnightblue",
+            "darkgoldenrod1",
+            "white"
           ),
-          nrow = 9,
-          ncol = 4
+          ylab = "proportion of variance",
+          density = c(NA, NA, NA, 20, 40, 20, 40, 20, NA),
+          angle = c(0, 0, 0, 45, 45, 135, 135, 0, 0)
         )
-      colnames(contributions_stacked) <-
-        c("total", "level-1", "level-2", "level-3")
-      rownames(contributions_stacked) <- c("f1", "f2", "f3",
-                                           "v12", "v13", "v23",
-                                           "m2", "m3", "resid")
-
-      barplot(
-        contributions_stacked,
-        main = "Decomposition",
-        horiz = FALSE,
-        ylim = c(0, 1),
-        col = c(
-          "darkred",
-          "steelblue",
-          "darkgoldenrod1",
-          "darkred",
-          "darkred",
-          "midnightblue",
-          "midnightblue",
-          "darkgoldenrod1",
-          "white"
-        ),
-        ylab = "proportion of variance",
-        density = c(NA, NA, NA, 20, 40, 20, 40, 20, NA),
-        angle = c(0, 0, 0, 45, 45, 135, 135, 0, 0)
-      )
-      legend(
-        4.89,
-        .7,
-        title = "source",
-        legend = rownames(contributions_stacked),
-        fill = c(
-          "darkred",
-          "steelblue",
-          "darkgoldenrod1",
-          "darkred",
-          "darkred",
-          "midnightblue",
-          "midnightblue",
-          "darkgoldenrod1",
-          "white"
-        ),
-        cex = .7,
-        pt.cex = 1,
-        xpd = TRUE,
-        density = c(NA, NA, NA, 30, 50, 30, 50, 30, NA),
-        angle = c(0, 0, 0, 45, 45, 135, 135, 0, 0)
-      )
+        legend(
+          4.89,
+          .7,
+          title = "source",
+          legend = rownames(contributions_stacked),
+          fill = c(
+            "darkred",
+            "steelblue",
+            "darkgoldenrod1",
+            "darkred",
+            "darkred",
+            "midnightblue",
+            "midnightblue",
+            "darkgoldenrod1",
+            "white"
+          ),
+          cex = .7,
+          pt.cex = 1,
+          xpd = TRUE,
+          density = c(NA, NA, NA, 30, 50, 30, 50, 30, NA),
+          angle = c(0, 0, 0, 45, 45, 135, 135, 0, 0)
+        )
+      }
 
       Output <- list(noquote(R2_table))
       names(Output) <- c("R2s")
