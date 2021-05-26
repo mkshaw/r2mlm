@@ -245,7 +245,7 @@ r2mlm3_manual <-
       colnames(R2_table) <- c("total", "l1", "l2", "l3")
 
       ##barchart
-      if (bagraph == TRUE) {
+      if (bargraph == TRUE) {
         contributions_stacked <-
           matrix(
             c(R2_f1_t, R2_f2_t, R2_f3_t, R2_v12_t,

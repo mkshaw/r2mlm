@@ -55,6 +55,7 @@
 #'
 #' @family r2mlm single model functions
 #'
+#' @importFrom rockchalk gmc
 
 r2mlm_long_manual <- function(data, covs, random_covs, clusterID,
                        gammas, Tau, sigma2, bargraph = TRUE) {
@@ -155,7 +156,7 @@ r2mlm_long_manual <- function(data, covs, random_covs, clusterID,
       legend(
         1.1,
         .65,
-        legend = rownames(contributions_stacked_avg),
+        legend = rownames(contributions_stacked),
         fill = c(
           "darkred",
           "steelblue",

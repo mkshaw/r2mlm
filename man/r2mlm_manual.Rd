@@ -106,6 +106,7 @@ c(19.68596,1.45138 , 3.68630, -0.37230), Tau = matrix(c(18.548, -0.676,
 
 Other r2mlm single model functions: 
 \code{\link{r2mlm3_manual}()},
+\code{\link{r2mlm_long_manual}()},
 \code{\link{r2mlm}()}
 }
 \concept{r2mlm single model functions}

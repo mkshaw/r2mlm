@@ -73,6 +73,7 @@ r2mlm(model_nlme)
 
 Other r2mlm single model functions: 
 \code{\link{r2mlm3_manual}()},
+\code{\link{r2mlm_long_manual}()},
 \code{\link{r2mlm_manual}()}
 }
 \concept{r2mlm single model functions}
