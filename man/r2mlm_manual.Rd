@@ -99,10 +99,10 @@ c(19.68596,1.45138 , 3.68630, -0.37230), Tau = matrix(c(18.548, -0.676,
 
 }
 \seealso{
-\href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
-  S. K. (2019). Quantifying explained variance in multilevel models: An
-  integrative framework for defining R-squared measures. Psychological
-  Methods, 24(3), 309–338.}
+Rights, J. D., & Sterba, S. K. (2019). Quantifying explained
+  variance in multilevel models: An integrative framework for defining
+  R-squared measures. Psychological Methods, 24(3), 309–338.
+  <doi:10.1080/00273171.2019.1660605>
 
 Other r2mlm single model functions: 
 \code{\link{r2mlm3_manual}()},

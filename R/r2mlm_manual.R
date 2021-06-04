@@ -66,10 +66,10 @@
 #' -0.396, -0.676, 1.064, -0.143, -0.396, -0.143, 3.612), 3, 3), sigma2 =
 #' 39.821, has_intercept = TRUE, clustermeancentered = TRUE)
 #'
-#' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
-#'   S. K. (2019). Quantifying explained variance in multilevel models: An
-#'   integrative framework for defining R-squared measures. Psychological
-#'   Methods, 24(3), 309–338.}
+#' @seealso Rights, J. D., & Sterba, S. K. (2019). Quantifying explained
+#'   variance in multilevel models: An integrative framework for defining
+#'   R-squared measures. Psychological Methods, 24(3), 309–338.
+#'   <doi:10.1080/00273171.2019.1660605>
 #'
 #' @family r2mlm single model functions
 #'

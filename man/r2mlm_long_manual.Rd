@@ -2,8 +2,8 @@
 % Please edit documentation in R/r2mlm_long_manual.R
 \name{r2mlm_long_manual}
 \alias{r2mlm_long_manual}
-\title{Compute R-squared values for longitudinal and non-centered-within-cluster
-models, manually inputting parameter estimates.}
+\title{Compute R-squared values for longitudinal multilevel models, manually
+inputting parameter estimates.}
 \usage{
 r2mlm_long_manual(
   data,
@@ -51,34 +51,37 @@ If the input is valid, then the output will be a list and associated
   valid, it will return an error.
 }
 \description{
-\code{r2mlm_long_manual} takes as input raw data and longitudinal or
-non-centered-within-cluster multilevel model (MLM) parameter estimates and
-outputs all relevant R-squared measures as well as an accompanying bar chart.
+\code{r2mlm_long_manual} takes as input raw data and  multilevel model (MLM)
+parameter estimates and outputs all relevant R-squared measures as well as an
+accompanying bar chart. This function extends the \code{r2mlm_manual}
+function by allowing researchers to input heteroscedastic variance estimates,
+and by providing level-specific measures for non-cluster-mean-centered
+models.
 }
 \details{
 This function reads in raw data as well as parameter estimates from the
 researcher’s previously fit longitudinal growth model (hence, any software
 program can have been used to fit the researcher’s longitudinal growth model
 prior to the use of this R function, so long as parameter estimates from the
-fitted model are recorded). This function then outputs R-squared measures as
-well as variance decompositions and associated barcharts. This function
-allows researchers to input heteroscedastic residual variance by including
-multiple estimates, for example, corresponding to individual timepoints.
-Users need not specify if predictors are person-mean-centered or not—the
-function will automatically output total, within-person, and between-person
-variance attributable to each potential source of explained variance (f1, f2,
-v1, v2, and m). Note, however, that the interpretations of these sources
-differ for person-mean-centered versus non-person-mean-centered models and
-that variance attributable to v2 will necessarily be 0 for
-person-mean-centered models.
+fitted model are recorded; note that this function accommodates
+non-longitudnal models as well). This function then outputs R-squared
+measures as well as variance decompositions and associated bar charts
+outlined in Rights & Sterba (2021). This function allows researchers to input
+heteroscedastic residual variance by including multiple estimates, for
+example, corresponding to individual timepoints. Users need not specify if
+predictors are person-mean-centered or not—the function will automatically
+output total, within-person, and between-person variance attributable to each
+potential source of explained variance (f1, f2, v1, v2, and m). Note,
+however, that the interpretations of these sources differ for
+person-mean-centered versus non-person-mean-centered models and that variance
+attributable to v2 will necessarily be 0 for person-mean-centered models.
 }
 \seealso{
-\href{https://doi.org/10.1002/cad.20387}{Rights, J. D., & Sterba, S.
-  K. (2021). Effect size measures for longitudinal growth analyses: Extending
-  a framework of multilevel model R-squareds to accommodate
-  heteroscedasticity, autocorrelation, nonlinearity, and alternative
-  centering strategies. New Directions for Child and Adolescent Development,
-  2021, 65– 110.}
+Rights, J. D., & Sterba, S. K. (2021). Effect size measures for
+  longitudinal growth analyses: Extending a framework of multilevel model
+  R-squareds to accommodate heteroscedasticity, autocorrelation,
+  nonlinearity, and alternative centering strategies. New Directions for
+  Child and Adolescent Development, 2021, 65– 110. <doi:10.1002/cad.20387>
 
 Other r2mlm single model functions: 
 \code{\link{r2mlm3_manual}()},

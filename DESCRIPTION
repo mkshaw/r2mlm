@@ -10,8 +10,8 @@ Authors@R: c(
 Maintainer: Mairead Shaw <mairead.shaw@mail.mcgill.ca>
 Description: Generates both total- and level-specific R-squared measures from
     Rights and Sterba’s (2019) <doi:10.1037/met0000184> framework of R-squared measures for multilevel
-    models with random intercepts and/or slopes, which is based on a completely
-    full decomposition of variance. Additionally generates graphical 
+    models with random intercepts and/or slopes, which is based on a complete
+    decomposition of variance. Additionally generates graphical 
     representations of these R-squared measures to allow visualizing and 
     interpreting all measures in the framework together as an integrated set.
     This framework subsumes 10 previously-developed R-squared measures for 

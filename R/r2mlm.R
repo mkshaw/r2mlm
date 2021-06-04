@@ -53,10 +53,10 @@
 #'
 #' r2mlm(model_nlme)
 #'
-#' @seealso \href{https://doi.org/10.1037/met0000184}{Rights, J. D., & Sterba,
-#'   S. K. (2019). Quantifying explained variance in multilevel models: An
-#'   integrative framework for defining R-squared measures. Psychological
-#'   Methods, 24(3), 309–338.}
+#' @seealso Rights, J. D., & Sterba, S. K. (2019). Quantifying explained
+#'   variance in multilevel models: An integrative framework for defining
+#'   R-squared measures. Psychological Methods, 24(3), 309–338.
+#'   <doi:10.1037/met0000184>
 #'
 #' @family r2mlm single model functions
 #'
