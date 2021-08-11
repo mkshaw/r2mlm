@@ -92,10 +92,10 @@ model <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m + control_m
 TRUE, control = lmerControl(optimizer = "bobyqa"))
 
 r2mlm_manual(data = teachsat, within_covs = c(5, 4), between_covs = c(7, 6,
-8), random_covs =  c(5, 4), gamma_w = c(1.55160, 2.69277), gamma_b =
-c(19.68596,1.45138 , 3.68630, -0.37230), Tau = matrix(c(18.548, -0.676,
--0.396, -0.676, 1.064, -0.143, -0.396, -0.143, 3.612), 3, 3), sigma2 =
-39.821, has_intercept = TRUE, clustermeancentered = TRUE)
+8), random_covs =  c(5, 4), gamma_w = c(0.074485, 0.310800), gamma_b =
+c(4.352652, 0.036759, 0.027532, -0.035250), Tau = matrix(c(0.387, 0.0000646,
+0.00625, 0.0000646, 0.00277, -0.000333, 0.00625, -0.000333, 0.0285), 3, 3),
+sigma2 = 0.55031, has_intercept = TRUE, clustermeancentered = TRUE)
 
 }
 \seealso{

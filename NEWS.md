@@ -1,3 +1,8 @@
+# r2mlm 0.3.1
+
+## Minor Edits
+* Updated `r2mlm_manual` and `r2mlm_comp_manual` documentation to reflect changes to `teachsat` dataset implemented in version 0.3.0. (#53)
+
 # r2mlm 0.3.0
 
 ## Major Changes

@@ -69,13 +69,14 @@
 #' TRUE, control = lmerControl(optimizer = "bobyqa"))
 #'
 #' r2mlm_comp_manual(data = teachsat, within_covs_modA = c(4), between_covs_modA
-#' = c(6, 8), random_covs_modA = c(4), gamma_w_modA = c(2.68263), gamma_b_modA =
-#' c(19.6868596, 3.61309, -0.42385), Tau_modA = matrix(c(26.882, -0.298, -0.298,
-#' 3.536), 2, 2), sigma2_modA = 53.522, within_covs_modB = c(5, 4),
+#' = c(6, 8), random_covs_modA = c(4), gamma_w_modA = c(0.314410), gamma_b_modA
+#' = c(6.892046, 0.059464, -0.037376), Tau_modA = matrix(c(0.559, 0.0105,
+#' 0.0105, 0.0273), 2, 2), sigma2_modA = 1.19295, within_covs_modB = c(5, 4),
 #' between_covs_modB = c(7, 6, 8), random_covs_modB = c(5, 4), gamma_w_modB =
-#' c(1.55160, 2.69277), gamma_b_modB = c(19.68596, 1.45138, 3.68630, -0.37230),
-#' Tau_modB = matrix(c(18.548, -0.676, -0.396, -0.676, 1.065, -0.143, -0.396,
-#' -0.143, 3.612), 3, 3), sigma2_modB = 39.821)
+#' c(0.074485, 0.310800), gamma_b_modB = c(4.352652, 0.036759, 0.027532,
+#' -0.035250), Tau_modB = matrix(c(0.387, 0.0000646, 0.00625, 0.0000646,
+#' 0.00277, -0.000333, 0.00625, -0.000333, 0.0285), 3, 3), sigma2_modB =
+#' 0.550311)
 #'
 #' @seealso Rights, J. D., & Sterba, S. K. (2019). Quantifying explained
 #'   variance in multilevel models: An integrative framework for defining
