@@ -59,6 +59,8 @@
 #' @family r2mlm single model functions
 #'
 #' @importFrom rockchalk gmc
+#'
+#' @export
 
 r2mlm_long_manual <- function(data, covs, random_covs, clusterID,
                        gammas, Tau, sigma2, bargraph = TRUE) {
