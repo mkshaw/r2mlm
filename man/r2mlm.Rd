@@ -41,6 +41,18 @@ is supported. Any of the level-1 predictors can have random slopes.
 \code{\link[lme4]{lmer}} or \code{\link[nlme]{nlme}}, then passes the model
 to helper functions that pull the raw data and parameter estimates from the
 model, and pass that information to \code{\link{r2mlm_manual}}.
+
+Previous MLM literature has offered two perspectives on how to treat variance
+attributable to random intercepts and slopes, called the “marginal” and
+“conditional” approaches (e.g., Edwards et al., 2008; Orelien & Edwards,
+2008; Vonesh & Chinchilli, 1997; Wang & Schaalje, 2009; Xu, 2003). In the
+marginal approach, all variance attributable to predictor and cluster mean
+variation is treated as unexplained. In the conditional approach, all
+variance attributable to predictors and cluster mean variation is treated as
+explained. This package offers researchers access to both the marginal and
+conditional approaches. There are 5 marginal measures: f1_total, f2_total,
+f_total, f1_within, and f2_between. The other 7 measures are conditional:
+v_total, m_total, fv_total, fvm_total, v_within, f1v_within, and m_between.
 }
 \examples{
 # Using lme4 for your model

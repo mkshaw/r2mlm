@@ -50,6 +50,22 @@
 #'   graphical representation of R-squared decompositions. If the input is not
 #'   valid, it will return an error.
 #'
+#' @examples
+#' # Removing cluster-mean-centering from the teachsat dataset, for
+#' demonstration purposes
+#'
+#' teachsat$salary <- teachsat$salary_c + 2
+#' uncentered_model <- lmer(satisfaction ~ salary + (1 | schoolID), data = teachsat)
+#'
+#' r2mlm_long_manual(data = teachsat,
+#'                   covs = c("salary"),
+#'                   random_covs = NULL,
+#'                   clusterID = "schoolID",
+#'                   gammas = c(0.07430),
+#'                   Tau = as.matrix(Matrix::bdiag(VarCorr(uncentered_model))),
+#'                   sigma2 = getME(uncentered_model, "sigma")^2,
+#'                   bargraph = TRUE)
+#'
 #' @seealso Rights, J. D., & Sterba, S. K. (2021). Effect size measures for
 #'   longitudinal growth analyses: Extending a framework of multilevel model
 #'   R-squareds to accommodate heteroscedasticity, autocorrelation,
