@@ -13,7 +13,7 @@
 #' program can have been used to fit the researcher’s longitudinal growth model
 #' prior to the use of this R function, so long as parameter estimates from the
 #' fitted model are recorded; note that this function accommodates
-#' non-longitudnal models as well). This function then outputs R-squared
+#' non-longitudinal models as well). This function then outputs R-squared
 #' measures as well as variance decompositions and associated bar charts
 #' outlined in Rights & Sterba (2021). This function allows researchers to input
 #' heteroscedastic residual variance by including multiple estimates, for
@@ -52,7 +52,7 @@
 #'
 #' @examples
 #' # Removing cluster-mean-centering from the teachsat dataset, for
-#' demonstration purposes
+#' # demonstration purposes
 #'
 #' teachsat$salary <- teachsat$salary_c + 2
 #' uncentered_model <- lmer(satisfaction ~ salary + (1 | schoolID), data = teachsat)

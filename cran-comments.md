@@ -1,9 +1,5 @@
 ## Resubmission
 
-This is a resubmission. In this version I have:
-
-* Replaced DOI links with the <doi> tag.
-
 ## Test environments
 * local macOS install, R 3.6.3
 * ubuntu 16.04 (on travis-ci), R 4.0.2
