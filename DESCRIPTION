@@ -1,7 +1,7 @@
 Package: r2mlm
 Type: Package
 Title: R-Squared Measures for Multilevel Models
-Version: 0.3.1
+Version: 0.3.1.9000
 Authors@R: c(
     person("Mairead", "Shaw", email = "mairead.shaw@mail.mcgill.ca", role = c("aut", "cre")),
     person("Jason", "Rights", email = "jrights@psych.ubc.ca", role = "aut"),
@@ -23,7 +23,6 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    broomExtra (>= 4.1.0),
     dplyr (>= 0.8.5),
     magrittr (>= 1.5),
     rlang (>= 0.4.6),

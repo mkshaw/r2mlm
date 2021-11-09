@@ -73,7 +73,6 @@
 #' @family r2mlm single model functions
 #'
 #' @importFrom lme4 ranef fixef VarCorr getME
-#' @importFrom broomExtra augment
 #' @importFrom nlme asOneFormula
 #' @importFrom magrittr %>%
 #' @importFrom stats terms formula model.frame
