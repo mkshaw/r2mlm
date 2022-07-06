@@ -80,7 +80,7 @@
 #' @importFrom stats terms formula model.frame
 #' @importFrom stringr str_split_fixed
 #' @importFrom rlang := .data
-#'
+#' @importFrom methods is
 #'
 #' @export
 
