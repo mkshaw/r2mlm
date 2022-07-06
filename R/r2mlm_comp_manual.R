@@ -160,12 +160,14 @@ r2mlm_comp_manual <- function(data,within_covs_modA,between_covs_modA,random_cov
     decomp_table <- matrix(c(decomp_fixed_within,decomp_fixed_between,decomp_varslopes,decomp_varmeans,decomp_sigma,
                              decomp_fixed_within_w,"NA",decomp_varslopes_w,"NA",decomp_sigma_w,
                              "NA",decomp_fixed_between_b,"NA",decomp_varmeans_b,"NA"),ncol=3)
+    decomp_table <- suppressWarnings(apply(decomp_table, 2, as.numeric)) # make values numeric, not character
     rownames(decomp_table) <- c("fixed, within","fixed, between","slope variation","mean variation","sigma2")
     colnames(decomp_table) <- c("total","within","between")
     R2_table <- matrix(c(R2_f1,R2_f2,R2_v,R2_m,R2_f,R2_fv,R2_fvm,
                          R2_f_w,"NA",R2_v_w,"NA","NA",R2_fv_w,"NA",
                          "NA",R2_f_b,"NA",R2_m_b,"NA","NA","NA")
                        ,ncol=3)
+    R2_table <- suppressWarnings(apply(R2_table, 2, as.numeric)) # make values numeric, not character
     rownames(R2_table) <- c("f1","f2","v","m","f","fv","fvm")
     colnames(R2_table) <- c("total","within","between")
     ##barchart

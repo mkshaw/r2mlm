@@ -209,6 +209,7 @@ r2mlm_long_manual <- function(data, covs, random_covs, clusterID,
         6,
         3
       )
+    decomp_table <- suppressWarnings(apply(decomp_table, 2, as.numeric)) # make values numeric, not character
     colnames(decomp_table) <- c("total", "within", "between")
     rownames(decomp_table) <- c(
       "fixed slopes (within)",
@@ -234,7 +235,7 @@ r2mlm_long_manual <- function(data, covs, random_covs, clusterID,
         8,
         3
       )
-
+    R2_table <- suppressWarnings(apply(R2_table, 2, as.numeric)) # make values numeric, not character
     colnames(R2_table) <- c("total", "within", "between")
     rownames(R2_table) <- c("f1", "f2", "v1", "v2", "m", "f", "fv", "fvm")
 

@@ -191,7 +191,7 @@ r2mlm_comp_lmer <- function(modelA, modelB, data, bargraph) {
 
   for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
+    if (!is(data[[variable]], "integer") && !is(data[[variable]], "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 
@@ -305,7 +305,7 @@ r2mlm_comp_lmer <- function(modelA, modelB, data, bargraph) {
 
   for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
+    if (!is(data[[variable]], "integer") && !is(data[[variable]], "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 
@@ -443,7 +443,7 @@ r2mlm_comp_nlme <- function(modelA, modelB, data, bargraph) {
 
   for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
+    if (!is(data[[variable]], "integer") && !is(data[[variable]], "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 
@@ -556,7 +556,7 @@ r2mlm_comp_nlme <- function(modelA, modelB, data, bargraph) {
 
   for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
+    if (!is(data[[variable]], "integer") && !is(data[[variable]], "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 

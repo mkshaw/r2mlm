@@ -1,3 +1,14 @@
+# r2mlm 0.3.2
+
+## Major Changes
+
+* Output now returns as numeric rather than characters. (#55)
+
+## Minor Edits
+
+* Removes broomExtra dependency. (#52, #57)
+* Changes how variable types are checked from if() to is().
+
 # r2mlm 0.3.1
 
 ## Major Changes

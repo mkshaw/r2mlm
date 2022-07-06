@@ -138,7 +138,7 @@ r2mlm_lmer <- function(model, bargraph) {
 
   for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
+    if (!is(data[[variable]], "integer") && !is(data[[variable]], "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 
@@ -254,7 +254,7 @@ r2mlm_nlme <- function(model, bargraph) {
 
   for (variable in outcome_and_predictors) {
 
-    if (!(class(data[[variable]]) == "integer") && !(class(data[[variable]]) == "numeric")) {
+    if (!is(data[[variable]], "integer") && !is(data[[variable]], "numeric")) {
       stop("Your data must be numeric. Only the cluster variable can be a factor.")
     }
 

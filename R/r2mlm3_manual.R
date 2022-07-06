@@ -240,6 +240,7 @@ r2mlm3_manual <-
           ,
           ncol = 4
         )
+      R2_table <- suppressWarnings(apply(R2_table, 2, as.numeric)) # make values numeric, not character
       rownames(R2_table) <-
         c("f1", "f2", "f3", "v12", "v13", "v23", "m2", "m3")
       colnames(R2_table) <- c("total", "l1", "l2", "l3")
@@ -676,6 +677,7 @@ r2mlm3_manual <-
           ),
           ncol = 4
         )
+      R2_table <- suppressWarnings(apply(R2_table, 2, as.numeric)) # make values numeric, not character
       rownames(R2_table) <-
         c("f1",
           "f2",
