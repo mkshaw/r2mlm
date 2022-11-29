@@ -172,7 +172,7 @@ r2mlm3_manual <-
       }
 
       if (is.null(random_covs23) == F) {
-        var_randomcovs23 <- var(cbind(data[, c(random_covs23)]), na.rm = T)
+        var_randomcovs23 <- var(cbind(1, data[, c(random_covs23)]), na.rm = T)
         psi23 <- matrix(c(diag(Tau23)), ncol = 1)
         kappa23 <- matrix(c(Tau23[lower.tri(Tau23) == TRUE]), ncol = 1)
         v23 <- matrix(c(diag(var_randomcovs23)), ncol = 1)
