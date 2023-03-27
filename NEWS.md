@@ -1,3 +1,10 @@
+# r2mlm 0.3.3
+
+## Minor Edits
+
+* Fixes typo in r2mlm3_manual (#59).
+* Fixes typo in r2mlm3_manual (#62).
+
 # r2mlm 0.3.2
 
 ## Major Changes

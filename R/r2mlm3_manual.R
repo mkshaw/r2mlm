@@ -434,7 +434,7 @@ r2mlm3_manual <-
       ##loop through level-3 clusters
       for (clus3 in seq(max(as.numeric(data[, l3clusterID_noncmc])))) {
         for (i in seq(nrow(data))) {
-          if (data[i, "schoolid"] == clus3) {
+          if (data[i, l3clusterID_noncmc] == clus3) {
             if (is.null(allfixedcovs_noncmc) == F) {
               for (ncov in seq(length(allfixedcovs_noncmc))) {
                 ##compute level-3 portion of predictor
