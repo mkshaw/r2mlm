@@ -1,3 +1,9 @@
+# r2mlm 0.3.4
+
+## Minor Edits
+
+* Replaces rockchalk dependency with misty v. 0.4.12.
+
 # r2mlm 0.3.3
 
 ## Minor Edits
