@@ -50,6 +50,21 @@
 #'   graphical representation of R-squared decompositions. If the input is not
 #'   valid, it will return an error.
 #'
+#' @examples
+#' # Removing cluster-mean-centering from the teachsat dataset, for
+#' # demonstration purposes
+#'
+#' teachsat$salary <- teachsat$salary_c + 2
+#' uncentered_model <- lmer(satisfaction ~ salary + (1 | schoolID), data = teachsat)
+#'
+#' r2mlm_long_manual(data = teachsat,
+#'                   covs = c("salary"),
+#'                   random_covs = NULL,
+#'                   clusterID = "schoolID",
+#'                   gammas = c(0.07430),
+#'                   Tau = as.matrix(Matrix::bdiag(VarCorr(uncentered_model))),
+#'                   sigma2 = getME(uncentered_model, "sigma")^2,
+#'                   bargraph = TRUE)
 #'
 #' @seealso Rights, J. D., & Sterba, S. K. (2021). Effect size measures for
 #'   longitudinal growth analyses: Extending a framework of multilevel model
@@ -59,10 +74,8 @@
 #'
 #' @family r2mlm single model functions
 #'
-#' @importFrom dplyr bind_cols group_by_at mutate sym ungroup
-#' @importFrom misty center
-#' @importFrom stats aggregate setNames
-#'
+#' @importFrom rockchalk gmc
+
 #' @export
 
 r2mlm_long_manual <- function(data, covs, random_covs, clusterID,
@@ -70,30 +83,7 @@ r2mlm_long_manual <- function(data, covs, random_covs, clusterID,
 
     if (is.null(covs) == FALSE) {
 
-      # get group mean values
-      group_means <- aggregate(data[, covs], by = data[clusterID], FUN = mean)
-
-      # Create column names with "_mn" suffix
-      mn_col_names <- paste0(covs, "_mn")
-
-      # Bind group means to the original dataframe
-      centered_data <- cbind(data, group_means[, -1])
-      colnames(centered_data)[(ncol(data) + 1):ncol(centered_data)] <- mn_col_names
-
-      # centered_data <- cbind(data,
-      #                        setNames(aggregate(x = data[, covs],
-      #                                  by = data[clusterID],
-      #                                  FUN = mean)[, -1],
-      #                                 paste0(covs, "_mn"))
-      # )
-
-      # get CWC values
-      centered_data <- lapply(covs, function(covariate) {
-        centered_data %>%
-          group_by_at(clusterID) %>%
-          mutate(!!paste0(covariate, "_dev") := center(!!sym(covariate))) %>%
-          ungroup()
-      })
+      centered_data <- gmc(data, covs, clusterID)
 
       phi_w <- var(centered_data[, c(paste0(covs, "_dev"))])
       phi_b <- var(centered_data[, c(paste0(covs, "_mn"))])
@@ -108,22 +98,7 @@ r2mlm_long_manual <- function(data, covs, random_covs, clusterID,
 
     if (is.null(random_covs) == FALSE) {
 
-
-      # get group mean values
-      centered_data_rand <- cbind(data,
-                             setNames(aggregate(x = data[, random_covs],
-                                                by = data[clusterID],
-                                                FUN = mean)[, -1],
-                                      paste0(random_covs, "_mn"))
-      )
-
-      # get CWC values
-      centered_data_rand <- cbind(centered_data_rand,
-                             center(data[, random_covs],
-                                    type = c("CWC"),
-                                    cluster = data[clusterID],
-                                    names = "_dev")
-      )
+      centered_data_rand <- gmc(data, random_covs, clusterID)
 
       Sig_w <- var(centered_data_rand[, c(paste0(random_covs, "_dev"))])
       Sig_b <- var(centered_data_rand[, c(paste0(random_covs, "_mn"))])

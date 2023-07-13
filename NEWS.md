@@ -1,3 +1,10 @@
+# r2mlm 0.3.5
+
+## Minor Edits
+
+* Added internal function to print citation on attachment.
+* Rockchalk fixed, so adding it back as a dependency.
+
 # r2mlm 0.3.4
 
 ## Minor Edits

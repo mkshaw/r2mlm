@@ -3,7 +3,7 @@
 usethis::use_data(teachsat, overwrite = TRUE)
 
 #load things
-library(misty)
+library(rockchalk)
 library(tidyverse)
 library(lme4)
 library(nlme)
@@ -71,16 +71,12 @@ teachsat[,"u1j"] <- rep(randomeffects[,2],each=clustersize)
 teachsat[,"u2j"] <- rep(randomeffects[,3],each=clustersize)
 
 #group-mean-center level-1 vars
-teachsat <- cbind(teachsat,
-                   center(teachsat[, c("control_c", "salary_c")],
-                          type = c("CWC"),
-                          cluster = teachsat$schoolID,
-                          names = "_dev"))
+teachsat<-gmc(teachsat,c("control_c","salary_c"),"schoolID")
 teachsat$control_c <-teachsat$control_c_dev
 teachsat$salary_c <-teachsat$salary_c_dev
 
 #remove unnecessary vars
-teachsat<- subset(teachsat, select = -c(control_c_dev,salary_c_dev))
+teachsat<- subset(teachsat, select = -c(control_c_dev,salary_c_dev,control_c_mn,salary_c_mn))
 
 #generate outcome
 for(i in seq(clusters*clustersize)){
