@@ -87,6 +87,7 @@ Rights, J. D., & Sterba, S. K. (2019). Quantifying explained
 
 Other r2mlm single model functions: 
 \code{\link{r2mlm3_manual}()},
+\code{\link{r2mlm_ci}()},
 \code{\link{r2mlm_long_manual}()},
 \code{\link{r2mlm_manual}()}
 }

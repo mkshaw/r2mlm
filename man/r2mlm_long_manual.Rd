@@ -102,6 +102,7 @@ Rights, J. D., & Sterba, S. K. (2021). Effect size measures for
 
 Other r2mlm single model functions: 
 \code{\link{r2mlm3_manual}()},
+\code{\link{r2mlm_ci}()},
 \code{\link{r2mlm_manual}()},
 \code{\link{r2mlm}()}
 }

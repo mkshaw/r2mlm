@@ -91,11 +91,18 @@ model <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m + control_m
 + s_t_ratio + (1 + salary_c + control_c | schoolID), data = teachsat, REML =
 TRUE, control = lmerControl(optimizer = "bobyqa"))
 
-r2mlm_manual(data = teachsat, within_covs = c(5, 4), between_covs = c(7, 6,
-8), random_covs =  c(5, 4), gamma_w = c(0.074485, 0.310800), gamma_b =
-c(4.352652, 0.036759, 0.027532, -0.035250), Tau = matrix(c(0.387, 0.0000646,
-0.00625, 0.0000646, 0.00277, -0.000333, 0.00625, -0.000333, 0.0285), 3, 3),
-sigma2 = 0.55031, has_intercept = TRUE, clustermeancentered = TRUE)
+r2mlm_manual(data = teachsat,
+             within_covs = c(5, 4),
+             between_covs = c(7, 6, 8),
+             random_covs =  c(5, 4),
+             gamma_w = c(0.074485, 0.310800),
+             gamma_b = c(4.352652, 0.036759, 0.027532, -0.035250),
+             Tau = matrix(c(0.387, 0.0000646,0.00625,
+                            0.0000646, 0.00277, -0.000333,
+                            0.00625, -0.000333, 0.0285), 3, 3),
+             sigma2 = 0.55031,
+             has_intercept = TRUE,
+             clustermeancentered = TRUE)
 
 }
 \seealso{
@@ -106,6 +113,7 @@ Rights, J. D., & Sterba, S. K. (2019). Quantifying explained
 
 Other r2mlm single model functions: 
 \code{\link{r2mlm3_manual}()},
+\code{\link{r2mlm_ci}()},
 \code{\link{r2mlm_long_manual}()},
 \code{\link{r2mlm}()}
 }

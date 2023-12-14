@@ -151,6 +151,7 @@ random_covs13, random_covs23, gamma_3, Tau13, Tau23.
 }
 \seealso{
 Other r2mlm single model functions: 
+\code{\link{r2mlm_ci}()},
 \code{\link{r2mlm_long_manual}()},
 \code{\link{r2mlm_manual}()},
 \code{\link{r2mlm}()}

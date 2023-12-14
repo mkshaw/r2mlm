@@ -102,15 +102,24 @@ modelB <- lmer(satisfaction ~ 1 + salary_c + control_c + salary_m + control_m
 + s_t_ratio + (1 + salary_c + control_c | schoolID), data = teachsat, REML =
 TRUE, control = lmerControl(optimizer = "bobyqa"))
 
-r2mlm_comp_manual(data = teachsat, within_covs_modA = c(4), between_covs_modA
-= c(6, 8), random_covs_modA = c(4), gamma_w_modA = c(0.314410), gamma_b_modA
-= c(6.892046, 0.059464, -0.037376), Tau_modA = matrix(c(0.559, 0.0105,
-0.0105, 0.0273), 2, 2), sigma2_modA = 1.19295, within_covs_modB = c(5, 4),
-between_covs_modB = c(7, 6, 8), random_covs_modB = c(5, 4), gamma_w_modB =
-c(0.074485, 0.310800), gamma_b_modB = c(4.352652, 0.036759, 0.027532,
--0.035250), Tau_modB = matrix(c(0.387, 0.0000646, 0.00625, 0.0000646,
-0.00277, -0.000333, 0.00625, -0.000333, 0.0285), 3, 3), sigma2_modB =
-0.550311)
+r2mlm_comp_manual(data = teachsat,
+                  within_covs_modA = c(4),
+                  between_covs_modA = c(6, 8),
+                  random_covs_modA = c(4),
+                  gamma_w_modA = c(0.314410),
+                  gamma_b_modA = c(6.892046, 0.059464, -0.037376),
+                  Tau_modA = matrix(c(0.559, 0.0105, 0.0105, 0.0273),
+                                    2, 2),
+                  sigma2_modA = 1.19295,
+                  within_covs_modB = c(5, 4),
+                  between_covs_modB = c(7, 6, 8),
+                  random_covs_modB = c(5, 4),
+                  gamma_w_modB = c(0.074485, 0.310800),
+                  gamma_b_modB = c(4.352652, 0.036759, 0.027532, -0.035250),
+                  Tau_modB = matrix(c(0.387, 0.0000646, 0.00625,
+                                      0.0000646, 0.00277, -0.000333,
+                                      0.00625, -0.000333, 0.0285), 3, 3),
+                 sigma2_modB = 0.550311)
 
 }
 \seealso{

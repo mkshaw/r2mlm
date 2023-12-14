@@ -1,3 +1,18 @@
+# r2mlm 0.3.6
+
+## Major Changes
+
+* Add confidence interval functionality for two-level models using Mark Lai's
+bootmlm package: Lai, M.H.C. (2021). Bootstrap Confidence Intervals for
+Multilevel Standardized Effect Size. Multivariate Behavioural Research, 56(4),
+558-578. This only works with the automatic r2mlm() function and lme4 because
+bootmlm requires a fitted merMod object from lmer.
+
+## Minor Edits
+
+* Edited formatting of r2mlm_manual() and r2mlm_comp_manual() documentation to
+make the examples easier to read.
+
 # r2mlm 0.3.5
 
 ## Minor Edits
