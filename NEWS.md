@@ -1,4 +1,4 @@
-# r2mlm 0.3.6
+# r2mlm 0.3.7
 
 ## Major Changes
 
