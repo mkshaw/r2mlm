@@ -1,3 +1,7 @@
+## Resubmission
+
+Resubmitting with bootmlm added as dependency and fixed a moved URL.
+
 ## Test environments
 * local macOS install, R 3.6.3
 * win-builder (devel and release)

@@ -62,7 +62,6 @@
 #' @importFrom stringr str_split_fixed
 #' @importFrom rlang := .data
 #' @importFrom methods is
-#' @importFrom bootmlm bootstrap_mer
 #'
 #' @export
 
