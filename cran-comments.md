@@ -1,6 +1,6 @@
 ## Resubmission
 
-Resubmitting with bootmlm added as dependency and fixed a moved URL.
+Resubmitting with location added for bootmlm repository.
 
 ## Test environments
 * local macOS install, R 3.6.3
