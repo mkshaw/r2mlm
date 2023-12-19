@@ -1,6 +1,6 @@
 ## Resubmission
 
-Resubmitting with location added for bootmlm repository.
+Resubmitting with location added for bootmlm repository, properly formatted.
 
 ## Test environments
 * local macOS install, R 3.6.3

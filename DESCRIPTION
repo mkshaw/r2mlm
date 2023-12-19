@@ -39,6 +39,6 @@ Suggests:
     bootmlm,
     testthat,
     Matrix
-Additional_repositories: https://github.com/marklhc/bootmlm
+Additional_repositories: Download bootmlm from <https://github.com/marklhc/bootmlm>
 URL: https://github.com/mkshaw/r2mlm
 BugReports: https://github.com/mkshaw/r2mlm/issues
