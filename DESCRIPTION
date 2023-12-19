@@ -19,6 +19,8 @@ Description: Generates both total- and level-specific R-squared measures from
     also includes several newly-developed measures. Measures in the framework 
     can be used to compute R-squared differences when comparing multilevel 
     models (following procedures in Rights & Sterba (2020) <doi:10.1080/00273171.2019.1660605>).
+    Bootstrapped confidence intervals can also be calculated. To use the 
+    confidence interval functionality, download bootmlm from <https://github.com/marklhc/bootmlm>.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -39,6 +41,6 @@ Suggests:
     bootmlm,
     testthat,
     Matrix
-Additional_repositories: Download bootmlm from <https://github.com/marklhc/bootmlm>
+Additional_repositories: https://github.com/marklhc/bootmlm
 URL: https://github.com/mkshaw/r2mlm
 BugReports: https://github.com/mkshaw/r2mlm/issues
