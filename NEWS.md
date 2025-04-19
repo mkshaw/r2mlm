@@ -1,3 +1,10 @@
+# r2mlm 0.3.8
+
+## Minor Edits
+
+* Adds a warning to the r2mlm_ci() function above low coverage.
+* Addresses an issue in r2mlm3_manual() to make input match documentation.
+
 # r2mlm 0.3.7
 
 ## Major Changes

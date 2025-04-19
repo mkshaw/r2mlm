@@ -1,9 +1,9 @@
-## Resubmission
+## Submission
 
-Resubmitting with location added for bootmlm repository, properly formatted.
+A few minor updates.
 
 ## Test environments
-* local macOS install, R 3.6.3
+* local macOS install, R 4.4.0
 * win-builder (devel and release)
 
 ## R CMD check results
