@@ -67,6 +67,9 @@
 
 r2mlm_ci <- function(model, nsim, boottype, confinttype, level = 0.95, progress = T) {
 
+  print("WARNING: coverage of these confidence intervals is low for many conditions.
+        Results should be interpreted with caution.")
+
   # function to calculate r2s
   r2s <- function(.) {
     r2mlm(., bargraph = F)$R2s[c(1:8, 10, 13, 16, 18)]
